@@ -1,4 +1,4 @@
-# plantapop-core
+# plantapop-back
 
 
 ## Architecture:
