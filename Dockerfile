@@ -4,8 +4,8 @@ FROM python:3.10-slim-buster
 # Configurar el directorio de trabajo en /app
 WORKDIR /app
 
-# Configurar el entorno de producción
-ENV ENVIRONMENT=production
+# Configurar el path al configmap
+ENV CONFIGMAP_PATH=config/configmap.yml
 
 # Copiar el directorio 'code' del host a /app en el contenedor
 COPY ./code /app
@@ -21,6 +21,9 @@ RUN pip install $(ls dist/*.whl)
 
 # Copiar el script de inicio al contenedor
 COPY entrypoint.sh /app/start.sh
+
+# Copiar directorio configmap al contenedor
+COPY configmap /app/configmap
 
 # Dar permisos de ejecución al script
 RUN chmod +x /app/start.sh

@@ -12,6 +12,7 @@ uvicorn = "^0.22.0"
 SQLAlchemy = "^2.0.18"
 alembic = "^1.11.1"
 pydantic = "^2.0.2"
+PyYAML = "^6.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
