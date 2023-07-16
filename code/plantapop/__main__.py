@@ -1,14 +1,15 @@
 import uvicorn
-from plantapop import configmap
+
+from plantapop import CONFIGMAP
 
 
 def main():
     uvicorn.run(
         "plantapop:app",
-        host=configmap.HOST,
-        port=configmap.PORT,
-        reload=configmap.RELOAD,
-        workers=configmap.WORKERS,
+        host=CONFIGMAP.HOST,
+        port=CONFIGMAP.PORT,
+        reload=CONFIGMAP.RELOAD,
+        workers=CONFIGMAP.WORKERS,
     )
 
 

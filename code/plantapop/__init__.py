@@ -1,7 +1,8 @@
 from fastapi import FastAPI
+
 from plantapop.config import Config
 
 app = FastAPI()
-configmap = Config()
+CONFIGMAP = Config.get_instance()
 
-__all__ = ["app", "configmap"]
+__all__ = ["app", "CONFIGMAP"]
