@@ -2,19 +2,21 @@ import os
 import yaml
 import threading
 from typing import Optional
-from dataclasses import dataclass
+from pydantic_settings import BaseSettings
 
 EXCEPTION_MESSAGE = "CONFIGMAP_PATH environment variable not set \ntry: export CONFIGMAP_PATH=config/configmap.yml"
 
 
-@dataclass(frozen=True)
-class ConfigType:
+class ConfigType(BaseSettings):
     HOST: str
     PORT: int
     RELOAD: bool
     WORKERS: int
     ENVIRONMENT: str
     LOG_LEVEL: str
+
+    class Config:
+        frozen = True
 
 
 class Config:
