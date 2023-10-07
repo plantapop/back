@@ -10,12 +10,12 @@ class Controller:
         self.app = app
 
     def register(self):
-        self.app.add_api_route("/health_check", health_check, methods=["GET"])
         self._chat()
         self._discovery()
         self._geolocation()
         self._labeling()
         self._plantory()
+        self.app.add_api_route("/health_check", health_check, methods=["GET"])
 
     def _chat(self):
         pass
