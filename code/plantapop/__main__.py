@@ -5,7 +5,7 @@ from plantapop import CONFIGMAP
 
 def main():
     uvicorn.run(
-        "plantapop:app",
+        "shared_kernel:app",
         host=CONFIGMAP.HOST,
         port=CONFIGMAP.PORT,
         reload=CONFIGMAP.RELOAD,

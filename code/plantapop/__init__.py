@@ -1,12 +1,11 @@
 from fastapi import FastAPI
 
-from plantapop.config import Config
-from plantapop.controller import Controller
+from plantapop.shared_kernel.config import Config
+from plantapop.shared_kernel.controller import Controller
 
 app = FastAPI()
 CONFIGMAP = Config.get_instance()
 
-controller = Controller(app)
-controller.register()
+Controller(app).register()
 
 __all__ = ["app", "CONFIGMAP"]

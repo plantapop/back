@@ -9,6 +9,20 @@ EXCEPTION_MESSAGE = "CONFIGMAP_PATH environment variable not set \n'\
 try: export CONFIGMAP_PATH=config/configmap.yml"
 
 
+class JWTConfigType(BaseSettings):
+    """
+    JWTConfigType class to load the configmap
+    """
+
+    SECRET: str
+    ALGORITHM: str
+    TTL: int
+    REFRESH_TTL: int
+
+    class Config:
+        frozen = True
+
+
 class ConfigType(BaseSettings):
     """
     ConfigType class to load the configmap
@@ -20,6 +34,7 @@ class ConfigType(BaseSettings):
     WORKERS: int
     ENVIRONMENT: str
     LOG_LEVEL: str
+    JWT: JWTConfigType
 
     class Config:
         frozen = True
@@ -40,6 +55,7 @@ class Config:
             raise ValueError(EXCEPTION_MESSAGE)
         with open(config_path, "r", encoding="utf-8") as config_file:
             config_data = yaml.safe_load(config_file)
+
         return ConfigType(**config_data)
 
     @classmethod

@@ -4,3 +4,10 @@ RELOAD: true
 WORKERS: 1
 ENVIRONMENT: development
 LOG_LEVEL: debug
+
+JWT:
+  SECRET: test
+  ALGORITHM: HS256
+  TTL: 3600
+  REFRESH_TTL: 3600
+
