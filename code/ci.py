@@ -9,7 +9,7 @@ def run_black():
 
 def run_pylint():
     # Execute pylint
-    os.system("pylint --disable=C0114,C0115,C0116,R0903 shared_kernel")
+    os.system("pylint --disable=C0114,C0115,C0116,R0903 plantapop")
 
 
 def run_pytest():
