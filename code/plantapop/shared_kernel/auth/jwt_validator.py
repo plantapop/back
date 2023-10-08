@@ -11,11 +11,14 @@ class JWTValidator:
     @staticmethod
     def validate(token: str) -> dict[str, Union[str, datetime]]:
         try:
-            return jwt.decode(
+            payload = jwt.decode(
                 token,
-                CONFIGMAP.get("JWT_SECRET"),
-                algorithms=[CONFIGMAP.get("JWT_ALGORITHM")],
+                CONFIGMAP.JWT.SECRET,
+                algorithms=[CONFIGMAP.JWT.ALGORITHM],
             )
+            assert payload["scope"] == CONFIGMAP.JWT.ACCESS_SCOPE, "Invalid scope"
+            return payload
+
         except ExpiredSignatureError:
             raise Exception("Token expired")  # TODO: Create custom exception
         except JWTError:

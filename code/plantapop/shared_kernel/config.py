@@ -18,6 +18,8 @@ class JWTConfigType(BaseSettings):
     ALGORITHM: str
     TTL: int
     REFRESH_TTL: int
+    ACCESS_SCOPE: str
+    REFRESH_SCOPE: str
 
     class Config:
         frozen = True

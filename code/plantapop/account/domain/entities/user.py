@@ -51,6 +51,7 @@ class User:
         access = jwt.encode(
             {
                 "user_uuid": self.user_uuid,
+                "scope": CONFIGMAP.JWT.ACCESS_SCOPE,
                 "exp": datetime.datetime.utcnow()
                 + datetime.timedelta(seconds=CONFIGMAP.JWT.TTL),
             },
@@ -61,6 +62,7 @@ class User:
         refresh = jwt.encode(
             {
                 "user_uuid": self.user_uuid,
+                "scope": CONFIGMAP.JWT.REFRESH_SCOPE,
                 "exp": datetime.datetime.utcnow()
                 + datetime.timedelta(seconds=CONFIGMAP.JWT.REFRESH_TTL),
             },
