@@ -56,19 +56,18 @@ class SqlAlchemyGenericRepository(GenericRepository[GenericUUID, Entity]):
         self._check_not_removed(entity.uuid)
         assert (
             entity.uuid in self._identity_map
-        ), "Cannon persist entity which is unknown to the repo. Did you forget to call repo.add() for this entity?"
+        ), """Cannon persist entity which is unknown to the repo.
+        Did you forget to call repo.add() for this entity?"""
         instance = self.map_entity_to_model(entity)
         merged = self._session.merge(instance)
         self._session.add(merged)
 
     def persist_all(self):
-        """Persists all changes made to entities known to the repository (present in the identity map)."""
         for entity in self._identity_map.values():
             if entity is not REMOVED:
                 self.persist(entity)
 
     def collect_events(self):
-        """Collects all events from entities known to the repository (present in the identity map)."""
         events = []
         for entity in self._identity_map.values():
             if entity is not REMOVED:
@@ -85,7 +84,8 @@ class SqlAlchemyGenericRepository(GenericRepository[GenericUUID, Entity]):
     def map_entity_to_model(self, entity: Entity):
         assert self.mapper_class, (
             f"No data_mapper attribute in {self.__class__.__name__}. "
-            "Make sure to include `mapper_class = MyDataMapper` in the Repository class."
+            """Make sure to include `mapper_class = MyDataMapper`
+            in the Repository class."""
         )
 
         return self.data_mapper.entity_to_model(entity)
