@@ -10,7 +10,7 @@ class GenericUUID:
         return self.value
 
     def __eq__(self, other: "GenericUUID") -> bool:
-        if hasattr(other, 'value'):
+        if hasattr(other, "value"):
             return self.value == other.value
         return False
 

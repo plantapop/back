@@ -5,7 +5,7 @@ class Entity:
     uuid: GenericUUID
 
     def __eq__(self, other: "Entity") -> bool:
-        if hasattr(other, 'uuid'):
+        if hasattr(other, "uuid"):
             return self.uuid == other.uuid
         return False
 

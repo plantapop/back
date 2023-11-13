@@ -41,23 +41,21 @@ class SqlAlchemyGenericRepository(GenericRepository[GenericUUID, Entity]):
         self._identity_map[entity_uuid] = REMOVED
         instance = self._session.query(self.get_model_class()).get(entity_uuid)
         if instance is None:
-            raise EntityNotFoundException(
-                repository=self, entity_uuid=entity_uuid)
+            raise EntityNotFoundException(repository=self, entity_uuid=entity_uuid)
         self._session.delete(instance)
 
     def get_by_id(self, entity_uuid: GenericUUID):
         instance = self._session.query(self.get_model_class()).get(entity_uuid)
         if instance is None:
-            raise EntityNotFoundException(
-                repository=self, entity_uuid=entity_uuid)
+            raise EntityNotFoundException(repository=self, entity_uuid=entity_uuid)
         return self._get_entity(instance)
 
     def persist(self, entity: Entity):
         self._check_not_removed(entity.uuid)
-        assert (
-            entity.uuid in self._identity_map
-        ), """Cannon persist entity which is unknown to the repo.
-        Did you forget to call repo.add() for this entity?"""
+        assert entity.uuid in self._identity_map, """
+            Cannon persist entity which is unknown to the repo.
+            Did you forget to call repo.add() for this entity?
+        """
         instance = self.map_entity_to_model(entity)
         merged = self._session.merge(instance)
         self._session.add(merged)
