@@ -4,4 +4,5 @@
 alembic upgrade head
 
 # Iniciar la aplicación
-python3 -m plantapop
+python3 plantapop
+

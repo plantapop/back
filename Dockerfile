@@ -22,9 +22,6 @@ RUN pip install $(ls dist/*.whl)
 # Copiar el script de inicio al contenedor
 COPY entrypoint.sh /app/start.sh
 
-# Copiar directorio configmap al contenedor
-COPY configmap /app/configmap
-
 # Dar permisos de ejecución al script
 RUN chmod +x /app/start.sh
 

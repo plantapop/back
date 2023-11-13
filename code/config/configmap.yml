@@ -4,3 +4,8 @@ RELOAD: true
 WORKERS: 1
 ENVIRONMENT: development
 LOG_LEVEL: debug
+
+postgres:
+  url: postgresql+psycopg2://postgres:postgres@localhost:5432
+  database: local_db 
+
