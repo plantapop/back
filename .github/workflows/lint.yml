@@ -23,6 +23,14 @@ jobs:
         cd code
         pip install poetry
         poetry install
+    - name: Check import order with isort
+      run: |
+        cd code
+        poetry run isort --check-only .
+    - name: Lint code with flake8
+      run: |
+        cd code
+        poetry run flake8 .
     - name: Analysing the code with pylint
       run: |
         cd code
