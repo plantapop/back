@@ -29,21 +29,18 @@ jobs:
 
       - name: Build and Run Docker Compose
         run: |
-          docker-compose up -d
+          docker-compose up --detach --build
           docker-compose ps
 
       - name: Install Poetry
         run: |
           pip install poetry
 
-      - name: Install Dependencies
-        run: |
-          cd code
-          poetry install
-
       - name: Run Integration Tests
         run: |
           cd code
+          export CONFIGMAP_PATH=config/configmap.yml
+          poetry install
           poetry run integration
 
       - name: Stop Docker Compose
