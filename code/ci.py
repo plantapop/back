@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 
 def run_format():
@@ -7,15 +8,21 @@ def run_format():
     os.system("ruff format .")
 
 
+def run_command(command):
+    result = subprocess.run(command, shell=True)
+    if result.returncode != 0 and result.returncode != 5:
+        exit(result.returncode)
+
+
 def run_lint():
-    os.system("isort --check-only .")
-    os.system("ruff check .")
-    os.system("pflake8 .")
+    run_command("isort --check-only .")
+    run_command("ruff check .")
+    run_command("pflake8 .")
 
 
 def run_unittest():
-    os.system("pytest -m unit")
+    run_command("pytest -m unit")
 
 
 def run_integrationtest():
-    os.system("pytest -m integration")
+    run_command("pytest -m integration")
