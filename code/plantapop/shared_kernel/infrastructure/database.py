@@ -1,6 +1,6 @@
 import logging
 
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 logger = logging.getLogger(__name__)
 
