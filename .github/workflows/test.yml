@@ -26,4 +26,4 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         cd code
-        poetry run test
+        poetry run unittest

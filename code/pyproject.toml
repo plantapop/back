@@ -28,7 +28,8 @@ pyproject-flake8 = "^6.1.0"
 
 [tool.poetry.scripts]
 start = "plantapop.__main__:main"
-test = "ci:run_unittest"
+unittest = "ci:run_unittest"
+integration = "ci:run_integrationtest"
 format = "ci:run_format"
 lint = "ci:run_lint"
 
