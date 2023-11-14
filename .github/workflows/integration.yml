@@ -39,6 +39,7 @@ jobs:
       - name: Run Integration Tests
         run: |
           cd code
+          export CONFIGMAP_PATH=config/configmap.yml
           poetry install
           poetry run integration
 
