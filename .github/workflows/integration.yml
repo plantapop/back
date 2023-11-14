@@ -38,11 +38,11 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          cd code
           poetry install
 
       - name: Run Integration Tests
         run: |
-          cd code
           poetry run integration
 
       - name: Stop Docker Compose
