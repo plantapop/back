@@ -1,0 +1,50 @@
+name: Integration Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Install Docker and Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          sudo apt-get install -y docker-compose
+        shell: bash
+
+      - name: Build and Run Docker Compose
+        run: |
+          docker-compose up -d
+          docker-compose ps
+
+      - name: Install Poetry
+        run: |
+          pip install poetry
+
+      - name: Install Dependencies
+        run: |
+          cd code
+          poetry install
+
+      - name: Run Integration Tests
+        run: |
+          cd code
+          poetry run integration
+
+      - name: Stop Docker Compose
+        run: docker-compose down

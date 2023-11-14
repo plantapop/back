@@ -1,16 +1,21 @@
 import os
 
 
-def run_black():
-    # Execute black
+def run_format():
     os.system("black .")
+    os.system("isort .")
+    os.system("ruff format .")
 
 
-def run_pylint():
-    # Execute pylint
-    os.system("pylint --disable=C0114,C0116 plantapop")
+def run_lint():
+    os.system("isort --check-only .")
+    os.system("ruff check .")
+    os.system("pflake8 .")
 
 
-def run_pytest():
-    # Execute pytest
+def run_unittest():
     os.system("pytest -m unit")
+
+
+def run_integrationtest():
+    os.system("pytest -m integration")
