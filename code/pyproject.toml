@@ -17,6 +17,7 @@ pydantic-settings = "^2.0.2"
 sqlalchemy-utils = "^0.41.1"
 omegaconf = "^2.3.0"
 pyscopg2 = "^66.0.2"
+httpx = "^0.25.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"

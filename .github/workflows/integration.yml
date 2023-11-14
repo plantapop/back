@@ -30,21 +30,16 @@ jobs:
       - name: Build and Run Docker Compose
         run: |
           docker-compose up --detach --build
-          sleep 5
           docker-compose ps
 
       - name: Install Poetry
         run: |
           pip install poetry
 
-      - name: Install Dependencies
-        run: |
-          cd code
-          poetry install
-
       - name: Run Integration Tests
         run: |
           cd code
+          poetry install
           poetry run integration
 
       - name: Stop Docker Compose
