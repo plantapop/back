@@ -48,3 +48,11 @@ jobs:
 
       - name: Stop Docker Compose
         run: docker-compose down
+
+  services:
+    postgres:
+      env_file:
+        - postgres.env
+      image: postgres:16
+      ports:
+        - "5432:5432"
