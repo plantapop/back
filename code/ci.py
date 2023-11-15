@@ -26,3 +26,7 @@ def run_unittest():
 
 def run_integrationtest():
     run_command("pytest -m integration")
+
+
+def run_acceptancetest():
+    run_command("pytest -m acceptance")
