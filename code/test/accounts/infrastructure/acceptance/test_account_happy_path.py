@@ -5,7 +5,7 @@ from uuid import uuid4
 import pytest
 
 
-@pytest.mark.fixture
+@pytest.fixture
 def body(app_version):
     return {
         "app_version": app_version,
