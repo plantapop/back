@@ -1,5 +1,6 @@
 import pytest
 import sqlalchemy as sa
+import toml
 from fastapi.testclient import TestClient
 from sqlalchemy import event
 from sqlalchemy.orm import sessionmaker
@@ -43,3 +44,12 @@ def session():
 def client(session):
     with app.session.session.override(session):
         yield TestClient(app)
+
+
+@pytest.fixture()
+def app_version():
+    """Get App version from pyproject.toml"""
+
+    with open("pyproject.toml", "r") as f:
+        pyproject = toml.load(f)
+    return pyproject["tool"]["poetry"]["version"]
