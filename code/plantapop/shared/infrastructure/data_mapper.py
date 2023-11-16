@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 
-from shared_kernel.domain.entities import Entity
+from plantapop.shared.domain.entities import Entity
 
 MapperEntity = TypeVar("MapperEntity", bound=Entity)
 MapperModel = TypeVar("MapperModel", bound=Any)

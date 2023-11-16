@@ -22,7 +22,7 @@ def body(app_version):
 @pytest.mark.acceptance
 def test_create_account(client, body):
     # When
-    response = client.post(f"/user/registration/{uuid4()}", json=body)
+    response = client.post("/user/", json=body)
     token = response.json()["token"]
     registration = response.json()["registration"]
 
@@ -38,12 +38,42 @@ def test_create_account(client, body):
 
 
 @pytest.mark.acceptance
-def test_account_exists(client, body):
+def test_login(client, body):
     # Given
-    client.post(f"/user/registration/{uuid4()}", json=body)
+    client.post("/user/", json=body)
 
     # When
-    response = client.post(f"/user/registration/{uuid4()}", json=body)
+    response = client.post(
+        "/user/login", json={"email": body["email"], "password": body["password"]}
+    )
+    token = response.json()["token"]
+
+    # Then
+    assert response.status_code == 200
+    assert "access" in token.keys()
+    assert "refresh" in token.keys()
+
+
+@pytest.mark.acceptance
+def test_logout(client, body):
+    # Given
+    response = client.post("/user/", json=body)
+    token = response.json()["token"]["access"]
+
+    # When
+    response = client.post("/user/logout", headers={"Authorization": f"Bearer {token}"})
+
+    # Then
+    assert response.status_code == 204
+
+
+@pytest.mark.acceptance
+def test_account_exists(client, body):
+    # Given
+    client.post("/user/", json=body)
+
+    # When
+    response = client.post("/user/", json=body)
 
     assert response.status_code == 409
     assert response.json()["data"] == {"Error": "EMAIL_ALREADY_EXISTS"}
@@ -52,7 +82,7 @@ def test_account_exists(client, body):
 @pytest.mark.acceptance
 def test_refresh_token(client, body):
     # Given
-    response = client.post(f"/user/registration/{uuid4()}", json=body)
+    response = client.post("/user/", json=body)
     token = response.json()["token"]["refresh"]
 
     # When
@@ -67,7 +97,7 @@ def test_refresh_token(client, body):
 @pytest.mark.acceptance
 def test_delete_account(client, body):
     # Given
-    response = client.post(f"/user/registration/{uuid4()}", json=body)
+    response = client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
@@ -93,8 +123,8 @@ def test_account_not_found(client):
 @pytest.mark.acceptance
 def test_account_found(client, body):
     # Given
-    user_uuid = uuid4()
-    response = client.post(f"/user/registration/{user_uuid}", json=body)
+    user_uuid = body["uuid"]
+    response = client.post("/user/", json=body)
 
     # When
     response = client.get(f"/user/{user_uuid}")
@@ -109,8 +139,7 @@ def test_account_found(client, body):
 @pytest.mark.acceptance
 def test_change_password(client, body):
     # Given
-    user_uuid = uuid4()
-    response = client.post(f"/user/registration/{user_uuid}", json=body)
+    response = client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
@@ -127,8 +156,7 @@ def test_change_password(client, body):
 @pytest.mark.acceptance
 def test_invalid_acces_token(client, body):
     # Given
-    user_uuid = uuid4()
-    response = client.post(f"/user/registration/{user_uuid}", json=body)
+    response = client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
@@ -146,9 +174,8 @@ def test_invalid_acces_token(client, body):
 @pytest.mark.acceptance
 def test_invalid_refresh_token(client, body):
     # Given
-    user_uuid = uuid4()
-    response = client.post(f"/user/registration/{user_uuid}", json=body)
-    token = response.json()["token"]["access"]
+    response = client.post("/user/", json=body)
+    token = response.json()["token"]["refresh"]
 
     # When
     response = client.post(

@@ -1,8 +1,8 @@
-from shared_kernel.domain.entities import Entity
-from shared_kernel.domain.exceptions import EntityNotFoundException
-from shared_kernel.domain.repositories import GenericRepository
-from shared_kernel.domain.value_objects import GenericUUID
-from shared_kernel.infrastructure.data_mapper import DataMapper
+from plantapop.shared.domain.entities import Entity
+from plantapop.shared.domain.exceptions import EntityNotFoundException
+from plantapop.shared.domain.repositories import GenericRepository
+from plantapop.shared.domain.value_objects import GenericUUID
+from plantapop.shared.infrastructure.data_mapper import DataMapper
 from sqlalchemy.orm import DeclarativeBase, Session
 
 

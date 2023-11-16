@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.expression import text
 
+from plantapop.accounts.infrastructure.controller import router as accounts_router
+
 base_router = APIRouter()
 
 
@@ -22,6 +24,9 @@ async def readiness(session: Session = Depends(Provide["session"])) -> JSONRespo
     return JSONResponse(content=response_data, status_code=status_code)
 
 
+ROUTES = [base_router, accounts_router]
+
+
 class FastApiEndpoints:
     def __init__(self, app: FastAPI):
         self.app = app
@@ -30,8 +35,3 @@ class FastApiEndpoints:
         for router in ROUTES:
             self.app.include_router(router)
         return self.app
-
-
-ROUTES = [
-    base_router,
-]

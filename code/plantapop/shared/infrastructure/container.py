@@ -8,7 +8,7 @@ config = Config.get_instance()
 
 class SessionContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        modules=["plantapop.shared_kernel.infrastructure.endpoints"]
+        modules=["plantapop.shared.infrastructure.endpoints"]
     )
 
     session = providers.Singleton(

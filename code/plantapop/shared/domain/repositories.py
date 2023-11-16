@@ -1,8 +1,8 @@
 from abc import ABCMeta, abstractmethod
 from typing import Generic, TypeVar
 
-from shared_kernel.domain.entities import Entity as DomainEntity
-from shared_kernel.domain.value_objects import GenericUUID
+from plantapop.shared.domain.entities import Entity as DomainEntity
+from plantapop.shared.domain.value_objects import GenericUUID
 
 Entity = TypeVar("Entity", bound=DomainEntity)
 EntityUUID = TypeVar("EntityUUID", bound=GenericUUID)
