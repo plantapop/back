@@ -21,10 +21,10 @@ jobs:
     - name: Install dependencies
       run: |
         cd code
-        export CONFIGMAP_PATH=config/configmap.yml
         pip install poetry
         poetry install
     - name: Analysing the code with pylint
       run: |
+        export CONFIGMAP_PATH=config/configmap.yml
         cd code
         poetry run unittest
