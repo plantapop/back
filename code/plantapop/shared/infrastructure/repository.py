@@ -1,9 +1,10 @@
+from sqlalchemy.orm import DeclarativeBase, Session
+
 from plantapop.shared.domain.entities import Entity
 from plantapop.shared.domain.exceptions import EntityNotFoundException
 from plantapop.shared.domain.repositories import GenericRepository
 from plantapop.shared.domain.value_objects import GenericUUID
 from plantapop.shared.infrastructure.data_mapper import DataMapper
-from sqlalchemy.orm import DeclarativeBase, Session
 
 
 class Removed:
