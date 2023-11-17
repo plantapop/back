@@ -4,8 +4,8 @@ from plantapop.shared.domain.value_objects import GenericUUID
 
 
 class UserRepository(GenericRepository):
-    def check_email_is_unique(self, email: UserEmail):
+    def find_email(self, email: UserEmail):
         raise NotImplementedError
 
-    def check_user_not_exists(self, uuid: GenericUUID):
+    def find_user(self, uuid: GenericUUID):
         raise NotImplementedError

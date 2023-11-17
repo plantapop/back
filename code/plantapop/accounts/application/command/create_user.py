@@ -1,4 +1,5 @@
 from plantapop.accounts.domain.repository import UserRepository
+from plantapop.accounts.domain.services import check_email, check_uuid
 from plantapop.accounts.domain.user import User
 from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
 from plantapop.shared.domain.bus.event_bus import EventBus
@@ -20,9 +21,9 @@ class CreateUserCommand:
             language=user_dto.prefered_language,
         )
 
-        self.user_repository.check_email_is_unique(user.email)
+        check_uuid.check(repository=self.user_repository, uuid=user.uuid)
 
-        self.user_repository.check_user_not_exists(user.uuid)
+        check_email.check(repository=self.user_repository, email=user.email)
 
         self.user_repository.save(user)
         self.event_bus.publish(user.pull_domain_events())

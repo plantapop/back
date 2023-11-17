@@ -1,7 +1,3 @@
-from plantapop.accounts.domain.exceptions import (
-    EmailAlreadyExistsException,
-    UserAlreadyExistsException,
-)
 from plantapop.accounts.domain.user import User
 from plantapop.accounts.domain.value_objects.user_email import UserEmail
 from plantapop.shared.domain.value_objects import GenericUUID
@@ -19,12 +15,14 @@ class InMemoryRepository:
     def get(self, uuid: GenericUUID) -> User:
         return self.db[uuid]
 
-    def check_email_is_unique(self, email: UserEmail) -> None:
+    def find_email(self, email: UserEmail) -> bool:
         for user in self.db.values():
             if user.email == email:
-                raise EmailAlreadyExistsException
+                return True
+        return False
 
-    def check_user_not_exists(self, uuid: GenericUUID) -> None:
+    def find_user(self, uuid: GenericUUID) -> bool:
         for user in self.db.values():
             if user.uuid == uuid:
-                raise UserAlreadyExistsException
+                return True
+        return False
