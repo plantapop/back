@@ -1,56 +1,57 @@
 from datetime import datetime, timedelta
+from uuid import UUID
 
-import jose
+from plantapop.config import Config
+from plantapop.shared.domain.token.token import Token
 
-from plantapop import CONFIGMAP
-from plantapop.shared.domain.value_objects import GenericUUID
+CONFIGMAP = Config().get_instance()
 
 
 class TokenManager:
     def __init__(self):
-        self.access_token_duration = CONFIGMAP.jwt.access.duration
-        self.refresh_token_duration = CONFIGMAP.jwt.refresh.duration
+        self.access_token_duration = int(CONFIGMAP.jwt.access.duration)
+        self.refresh_token_duration = int(CONFIGMAP.jwt.refresh.duration)
 
         self.key = CONFIGMAP.jwt.key
         self.algorithm = CONFIGMAP.jwt.algorithm
+        self.expiration_margin = CONFIGMAP.jwt.refresh.refresh_expiration_margin
 
-    def create_tokens(self, uuid: GenericUUID) -> dict[str, str]:
-        access_token = self.create_access_token(uuid)
-        refresh_token = self.create_refresh_token(uuid)
+    def create_tokens(self, uuid: UUID, device: str) -> tuple[Token, Token]:
+        access_token = self._create_access_token(uuid, device)
+        refresh_token = self._create_refresh_token(uuid, device)
 
-        return {"access": access_token, "refresh": refresh_token}
+        return access_token, refresh_token
 
-    def validate_token(self, token: str) -> dict:
-        try:
-            return jose.jwt.decode(
-                token,
-                self.key,
-                algorithms=[self.algorithm],
-                options={"verify_aud": False},
+    def refresh_token(self, token: Token) -> tuple[Token, Token, bool]:
+        access = self._create_access_token(
+            token.get_user_uuid().get(), token.get_device()
+        )
+        update = False
+        if not token.get_exp() <= datetime.utcnow() + timedelta(
+            days=self.expiration_margin
+        ):
+            token = self._create_refresh_token(
+                token.get_user_uuid().get(), token.get_device()
             )
-        except jose.JWTError:
-            return {}
+            update = True
+        return access, token, update
 
-    def create_access_token(self, uuid: GenericUUID) -> str:
-        return jose.jwt.encode(
-            {
-                "exp": datetime.utcnow()
-                + timedelta(seconds=self.access_token_duration),
-                "uuid": uuid.get(),
-                "type": "access",
-            },
-            self.key,
+    def _create_access_token(self, uuid: UUID, device: str) -> Token:
+        return Token.create(
+            user_uuid=uuid,
+            token_type="access",
+            device=device,
+            exp=datetime.utcnow() + timedelta(seconds=self.access_token_duration),
             algorithm=self.algorithm,
+            key=self.key,
         )
 
-    def create_refresh_token(self, uuid: GenericUUID) -> str:
-        return jose.jwt.encode(
-            {
-                "exp": datetime.utcnow()
-                + timedelta(seconds=self.refresh_token_duration),
-                "uuid": uuid.get(),
-                "type": "refresh",
-            },
-            self.key,
+    def _create_refresh_token(self, uuid: UUID, device: str) -> Token:
+        return Token.create(
+            user_uuid=uuid,
+            token_type="refresh",
+            device=device,
+            exp=datetime.utcnow() + timedelta(seconds=self.refresh_token_duration),
             algorithm=self.algorithm,
+            key=self.key,
         )

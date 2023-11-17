@@ -6,9 +6,15 @@ from plantapop.config import Config
 config = Config.get_instance()
 
 
+engine = create_engine(config.postgres.url, echo=True)
+
+
 class SessionContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(
-        modules=["plantapop.shared.infrastructure.endpoints"]
+        modules=[
+            "plantapop.shared.infrastructure.endpoints",
+            "plantapop.shared.infrastructure.token.token_repository",
+        ]
     )
 
     session = providers.Singleton(
@@ -16,7 +22,7 @@ class SessionContainer(containers.DeclarativeContainer):
             orm.sessionmaker(
                 autocommit=False,
                 autoflush=False,
-                bind=create_engine(config.postgres.url, echo=True),
+                bind=engine,
             )
         )
     )

@@ -1,20 +1,26 @@
-from plantapop import CONFIGMAP
+from plantapop.config import Config
 from plantapop.shared.domain.token.exceptions import InvalidTokenException
 from plantapop.shared.domain.token.token_validation_service import (
     TokenValidationService,
 )
 from plantapop.shared.infrastructure.token.token_manager import TokenManager
-from plantapop.shared.infrastructure.token.token_repository import TokenRepository
+from plantapop.shared.infrastructure.token.token_repository import (
+    RefreshJwtTokenRepository,
+)
+
+CONFIGMAP = Config().get_instance()
 
 
 class RefreshToken:
     def __init__(self):
-        self.token_repository = TokenRepository()
+        self.token_repository = RefreshJwtTokenRepository()
         self.token_factory = TokenManager()
 
     def execute(self, token: str) -> dict[str, str]:
         validator = TokenValidationService(
-            CONFIGMAP.jwt.key, CONFIGMAP.jwt.algorithm, self.token_repository
+            key=CONFIGMAP.jwt.key,
+            algorithm=CONFIGMAP.jwt.algorithm,
+            repository=self.token_repository,
         )
 
         if not validator.is_valid(token, "refresh") or validator.is_revoked(token):

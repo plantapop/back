@@ -1,4 +1,5 @@
-import jose
+from jose import jwt
+from jose.exceptions import JWTError
 
 from plantapop.shared.domain.token.token import Token
 from plantapop.shared.domain.token.token_repository import TokenRepository
@@ -14,14 +15,14 @@ class TokenValidationService:
 
     def is_valid(self, token: str, token_type: str) -> bool:
         try:
-            decoded = jose.jwt.decode(
+            decoded = jwt.decode(
                 token,
                 self.key,
                 algorithms=[self.algorithm],
                 options={"verify_aud": False},
             )
             return decoded["type"] == token_type
-        except jose.JWTError:
+        except JWTError:
             return False
 
     def is_revoked(self, token: str) -> bool:

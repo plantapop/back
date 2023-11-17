@@ -1,12 +1,14 @@
 from uuid import UUID
 
-from plantapop.shared.infrastructure.tokens.token_manager import TokenManager
-from plantapop.shared.infrastructure.tokens.token_repository import TokenRepository
+from plantapop.shared.infrastructure.token.token_manager import TokenManager
+from plantapop.shared.infrastructure.token.token_repository import (
+    RefreshJwtTokenRepository,
+)
 
 
 class CreateToken:
     def __init__(self):
-        self.token_repository = TokenRepository()
+        self.token_repository = RefreshJwtTokenRepository()
         self.token_factory = TokenManager()
 
     def execute(self, uuid: UUID, device: str) -> dict[str, str]:
@@ -21,5 +23,6 @@ class CreateToken:
         access, refresh = self.token_factory.create_tokens(uuid, device)
 
         self.token_repository.save(refresh)
+        print(access.token)
 
         return {"access": access.token, "refresh": refresh.token}
