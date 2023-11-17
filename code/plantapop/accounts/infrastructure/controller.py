@@ -26,8 +26,6 @@ def registration(body: registration.RegistrationDto):
                 {"data": {"Error": "USER_ALREADY_EXISTS"}}, status_code=409
             )
 
-
-
     return JSONResponse(
         {
             "token": {"access": {}, "refresh": {}},

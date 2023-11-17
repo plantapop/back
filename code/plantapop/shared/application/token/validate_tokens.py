@@ -1,17 +1,17 @@
 from uuid import UUID
+
 from plantapop import CONFIGMAP
+from plantapop.shared.domain.token.exceptions import InvalidTokenException
 from plantapop.shared.domain.token.token_validation_service import (
     TokenValidationService,
 )
-from plantapop.shared.domain.token.exceptions import InvalidTokenException
 
 
 class ValidateToken:
-
     def execute(self, token: str) -> UUID:
-
         validator = TokenValidationService(
-            CONFIGMAP.jwt.key, CONFIGMAP.jwt.algorithm,
+            CONFIGMAP.jwt.key,
+            CONFIGMAP.jwt.algorithm,
         )
 
         if not validator.is_valid(token, "access"):

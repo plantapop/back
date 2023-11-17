@@ -1,6 +1,7 @@
 from uuid import UUID
-from plantapop.shared.infrastructure.token.token_repository import TokenRepository
+
 from plantapop.shared.domain.token.token import Token
+from plantapop.shared.infrastructure.token.token_repository import TokenRepository
 
 
 class RevokeAll:
@@ -13,4 +14,3 @@ class RevokeAll:
             token.revoke()
 
         self.token_repository.save_all(tokens)
-
