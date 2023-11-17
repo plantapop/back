@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pytest
 
-from plantapop.accounts.application.command.create_user import CreateUserCommand
+from plantapop.accounts.application.command.create_user import CreateUserCommandHandler
 from plantapop.accounts.domain.events.user_created import UserCreatedEvent
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
@@ -41,7 +41,7 @@ def test_create_user_saves_user(database, event_bus, app_version):
     )
 
     # When
-    create_user_command = CreateUserCommand(database, event_bus)
+    create_user_command = CreateUserCommandHandler(database, event_bus)
     create_user_command.execute(registration_dto)
 
     # Then
@@ -66,7 +66,7 @@ def test_create_users_sends_domain_events(database, event_bus, app_version):
     )
 
     # When
-    create_user_command = CreateUserCommand(database, event_bus)
+    create_user_command = CreateUserCommandHandler(database, event_bus)
     create_user_command.execute(registration_dto)
 
     # Then
@@ -105,7 +105,7 @@ def test_create_user_raises_exception_if_user_already_exists(
     )
 
     # When
-    create_user_command = CreateUserCommand(database, event_bus)
+    create_user_command = CreateUserCommandHandler(database, event_bus)
     create_user_command.execute(registration_dto)
 
     # Then
@@ -146,7 +146,7 @@ def test_create_user_raises_exception_if_email_already_exists(
     )
 
     # When
-    create_user_command = CreateUserCommand(database, event_bus)
+    create_user_command = CreateUserCommandHandler(database, event_bus)
     create_user_command.execute(registration_dto)
 
     # Then

@@ -5,7 +5,7 @@ from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
 from plantapop.shared.domain.bus.event_bus import EventBus
 
 
-class CreateUserCommand:
+class CreateUserCommandHandler:
     def __init__(self, user_repository: UserRepository, event_bus: EventBus):
         self.user_repository = user_repository
         self.event_bus = event_bus
