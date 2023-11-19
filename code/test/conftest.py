@@ -2,7 +2,7 @@ import pytest
 import toml
 
 try:
-    from test.shared.fixtures import client, session  # noqa
+    from test.shared.infrastructure.fixtures import client, session  # noqa
 except Exception as e:
     print(f"No database available: Only unittest can be run: {e}")
 

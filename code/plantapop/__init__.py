@@ -10,9 +10,7 @@ CONFIGMAP = Config.get_instance()
 
 def configure_database(container):
     from plantapop.shared.infrastructure.database import Base
-    from plantapop.shared.infrastructure.token.token_repository import RefreshToken
 
-    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
 
 

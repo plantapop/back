@@ -9,6 +9,7 @@ import pytest
 def body(app_version):
     return {
         "app_version": app_version,
+        "uuid": str(uuid4()),
         "name": "test",
         "surnames": ["Super", "Test"],
         "generate_token": True,

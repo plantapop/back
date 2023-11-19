@@ -34,7 +34,9 @@ def session():
 
     yield session
 
-    session.close()
+    if session.is_active:
+        session.close()
+
     transaction.rollback()
     connection.close()
 

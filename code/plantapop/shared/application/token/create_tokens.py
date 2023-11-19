@@ -23,6 +23,5 @@ class CreateToken:
         access, refresh = self.token_factory.create_tokens(uuid, device)
 
         self.token_repository.save(refresh)
-        print(access.token)
 
         return {"access": access.token, "refresh": refresh.token}

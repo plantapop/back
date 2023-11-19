@@ -12,6 +12,8 @@ class TokenValidationService:
         self.repository = repository
         self.key = key
         self.algorithm = algorithm
+        self.token: Token | None = None
+        self.payload: dict | None = None
 
     def is_valid(self, token: str, token_type: str) -> bool:
         try:
@@ -21,6 +23,7 @@ class TokenValidationService:
                 algorithms=[self.algorithm],
                 options={"verify_aud": False},
             )
+            self.payload = decoded
             return decoded["type"] == token_type
         except JWTError:
             return False

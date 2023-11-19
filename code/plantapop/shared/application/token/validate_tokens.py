@@ -1,10 +1,12 @@
 from uuid import UUID
 
-from plantapop import CONFIGMAP
+from plantapop.config import Config
 from plantapop.shared.domain.token.exceptions import InvalidTokenException
 from plantapop.shared.domain.token.token_validation_service import (
     TokenValidationService,
 )
+
+CONFIGMAP = Config().get_instance()
 
 
 class ValidateToken:
@@ -17,4 +19,4 @@ class ValidateToken:
         if not validator.is_valid(token, "access"):
             raise InvalidTokenException()
 
-        return validator.token.get_user_uuid()
+        return UUID(validator.payload["uuid"])

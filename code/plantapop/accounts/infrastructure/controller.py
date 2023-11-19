@@ -14,12 +14,12 @@ from plantapop.shared.application.token.create_tokens import CreateToken
 
 router = APIRouter(prefix="/user", tags=["user"])
 
+db = InMemoryRepository()
 
-@router.post("/registration/")
+
+@router.post("/")
 def registration(body: registration.RegistrationDto):
-    command = CreateUserCommandHandler(
-        user_repository=InMemoryRepository(), event_bus=InMemoryEventBus()
-    )
+    command = CreateUserCommandHandler(user_repository=db, event_bus=InMemoryEventBus())
     try:
         command.execute(body)
     except (EmailAlreadyExistsException, UserAlreadyExistsException) as e:
