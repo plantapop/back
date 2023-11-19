@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 from plantapop import app
 from plantapop.config import Config
-from plantapop.shared.infrastructure.database import Base
+from plantapop.shared.infrastructure.repository.database import Base
 
 config = Config.get_instance()
 

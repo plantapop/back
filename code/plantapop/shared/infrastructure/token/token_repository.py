@@ -7,8 +7,8 @@ from sqlalchemy.orm.session import Session
 
 from plantapop.shared.domain.token.token import Token
 from plantapop.shared.domain.token.token_repository import TokenRepository
-from plantapop.shared.infrastructure.data_mapper import DataMapper
-from plantapop.shared.infrastructure.database import Base
+from plantapop.shared.infrastructure.repository.data_mapper import DataMapper
+from plantapop.shared.infrastructure.repository.database import Base
 
 
 class RefreshToken(Base):

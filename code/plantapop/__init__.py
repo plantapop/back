@@ -9,7 +9,7 @@ CONFIGMAP = Config.get_instance()
 
 
 def configure_database(container):
-    from plantapop.shared.infrastructure.database import Base
+    from plantapop.shared.infrastructure.repository.database import Base
 
     Base.metadata.create_all(bind=engine)
 
