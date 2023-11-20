@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Generic, TypeVar
 
 from plantapop.shared.domain.entities import Entity as DomainEntity
+from plantapop.shared.domain.specification.specification import Specification
 from plantapop.shared.domain.value_objects import GenericUUID
 
 Entity = TypeVar("Entity", bound=DomainEntity)
@@ -14,17 +15,21 @@ class GenericRepository(Generic[EntityUUID, Entity], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_all(self) -> list[Entity]:
+    def save(self, entity: Entity) -> None:
         pass
 
     @abstractmethod
-    def add(self, entity: Entity) -> None:
-        pass
-
-    @abstractmethod
-    def update(self, entity: Entity) -> None:
+    def save_all(self, entities: list[Entity]) -> None:
         pass
 
     @abstractmethod
     def delete(self, entity: Entity) -> None:
+        pass
+
+    @abstractmethod
+    def exists(self, uuid: GenericUUID) -> bool:
+        pass
+
+    @abstractmethod
+    def matching(self, specification: Specification) -> list[Entity]:
         pass

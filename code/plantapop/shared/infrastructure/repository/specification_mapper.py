@@ -78,7 +78,7 @@ class SpecificationMapper:
     def __init__(self, map: dict[str, str]):
         self.map = map
 
-    def run_specification(self, query: Query, specification: Specification) -> Query:
+    def apply(self, query: Query, specification: Specification) -> Query:
         if specification.filter:
             filters = self.map_filters(specification.filter)
             query = apply_filters(query, filters)

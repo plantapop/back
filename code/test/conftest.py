@@ -2,9 +2,9 @@ import pytest
 import toml
 
 try:
-    from test.shared.infrastructure.fixtures import client, session  # noqa
+    from test.shared.infrastructure.acceptance_fixtures import client, session  # noqa
 except Exception as e:
-    print(f"No database available: Only unittest can be run: {e}")
+    print(f"No database available: Only unittest or integration can be run: {e}")
 
 
 @pytest.fixture()
