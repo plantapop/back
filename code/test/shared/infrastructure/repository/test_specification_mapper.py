@@ -62,9 +62,7 @@ def test_specification_mapper_case_3(database):
 
     spec = Specification(
         filter=Equals("name", "John")
-        | (
-            NotEqual("age", 25) | (Contains("email", ["hotmail"]) & LessThan("age", 35))
-        )  # noqa
+        | (NotEqual("age", 25) | (Contains("email", ["hotmail"]) & LessThan("age", 35)))  # noqa
     )
 
     # When

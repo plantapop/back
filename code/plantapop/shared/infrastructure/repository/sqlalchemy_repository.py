@@ -91,9 +91,7 @@ class SQLAlchemyRepository(GenericRepository):
         if entity.uuid in self.identity_map:
             del self.identity_map[entity.uuid]
 
-    def exists(
-        self, uuid: GenericUUID = None, spec: Specification = None
-    ) -> bool:
+    def exists(self, uuid: GenericUUID = None, spec: Specification = None) -> bool:
         if uuid:
             if uuid in self.identity_map:
                 return True
