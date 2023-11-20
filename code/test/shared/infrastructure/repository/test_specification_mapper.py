@@ -1,4 +1,4 @@
-from test.shared.infrastructure.repository.conftest import MAP, TestBase
+from test.shared.infrastructure.repository.conftest import MAP, AlchemyBase
 
 import pytest
 from sqlalchemy.orm import Query
@@ -22,7 +22,7 @@ def test_specification_mapper_case_1(database, john_smith):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(database.query(TestBase), spec).all()
+    query: Query = mapper.apply(database.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 1
@@ -42,7 +42,7 @@ def test_specification_mapper_case_2(database, john_smith, jane_smith):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(database.query(TestBase), spec).all()
+    query: Query = mapper.apply(database.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 2
@@ -67,7 +67,7 @@ def test_specification_mapper_case_3(database):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(database.query(TestBase), spec).all()
+    query: Query = mapper.apply(database.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 4

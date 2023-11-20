@@ -1,7 +1,7 @@
 import copy
 from test.shared.infrastructure.repository.conftest import (
     MAP,
-    TestBase,
+    AlchemyBase,
     TestBaseDataMapper,
 )
 from uuid import uuid4
@@ -19,15 +19,15 @@ from plantapop.shared.infrastructure.repository.sqlalchemy_repository import (
 )
 
 
-class TestRepo(SQLAlchemyRepository):
+class AlchTestRep(SQLAlchemyRepository):
     specification_mapper = SpecificationMapper(MAP)
     mapper = TestBaseDataMapper
-    model = TestBase
+    model = AlchemyBase
 
 
 @pytest.fixture
 def repository(database):
-    return TestRepo(database)
+    return AlchTestRep(database)
 
 
 @pytest.mark.integration

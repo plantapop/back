@@ -23,7 +23,7 @@ class DomainTestBase:
         self.email = email
 
 
-class TestBase(Base):
+class AlchemyBase(Base):
     __tablename__ = "test_base"
 
     uuid = Column(Uuid, primary_key=True)
@@ -32,10 +32,10 @@ class TestBase(Base):
     table_email = Column(String, nullable=False)
 
 
-class TestBaseDataMapper(DataMapper[DomainTestBase, TestBase]):
+class TestBaseDataMapper(DataMapper[DomainTestBase, AlchemyBase]):
     @classmethod
-    def entity_to_model(cls, entity: DomainTestBase) -> TestBase:
-        return TestBase(
+    def entity_to_model(cls, entity: DomainTestBase) -> AlchemyBase:
+        return AlchemyBase(
             uuid=entity.uuid.get(),
             table_name=entity.name,
             table_age=entity.age,
@@ -43,7 +43,7 @@ class TestBaseDataMapper(DataMapper[DomainTestBase, TestBase]):
         )
 
     @classmethod
-    def model_to_entity(cls, model: TestBase) -> DomainTestBase:
+    def model_to_entity(cls, model: AlchemyBase) -> DomainTestBase:
         return DomainTestBase(
             uuid=model.uuid,
             name=model.table_name,
