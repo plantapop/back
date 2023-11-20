@@ -1,11 +1,12 @@
 import uvicorn
 
-from plantapop import CONFIGMAP
+from plantapop import CONFIGMAP, create_app
 
 
 def main():
+    app = create_app()
     uvicorn.run(
-        "plantapop:app",
+        app,
         host=CONFIGMAP.HOST,
         port=CONFIGMAP.PORT,
         reload=CONFIGMAP.RELOAD,

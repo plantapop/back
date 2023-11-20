@@ -24,7 +24,7 @@ from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
 
 class AlchTestRep(SQLAlchemyRepository):
     specification_mapper = SpecificationMapper(MAP)
-    mapper = TestBaseDataMapper
+    mapper = TestBaseDataMapper()
     model = AlchemyBase
 
 
@@ -33,9 +33,10 @@ class SqlTestUoW(SQLAlchemyUnitOfWork):
 
 
 @pytest.fixture
-def repository(session):
-    with SqlTestUoW(session) as repo:
-        yield repo
+def repository(container, session):
+    with container.session.override(session):
+        with SqlTestUoW() as repo:
+            yield repo
 
 
 @pytest.mark.integration

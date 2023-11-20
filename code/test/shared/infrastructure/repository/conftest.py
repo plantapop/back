@@ -6,14 +6,11 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from plantapop.shared.domain.value_objects import GenericUUID
 from plantapop.shared.infrastructure.repository.data_mapper import DataMapper
-from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
-    SQLAlchemyUnitOfWork,
-)
 
 Base = declarative_base()
 
 
-class DomainTestBase:
+class DomainBase:
     uuid: int
     name: str
     age: int
@@ -35,9 +32,9 @@ class AlchemyBase(Base):
     table_email = Column(String, nullable=False)
 
 
-class TestBaseDataMapper(DataMapper[DomainTestBase, AlchemyBase]):
+class TestBaseDataMapper(DataMapper[DomainBase, AlchemyBase]):
     @classmethod
-    def entity_to_model(cls, entity: DomainTestBase) -> AlchemyBase:
+    def entity_to_model(cls, entity: DomainBase) -> AlchemyBase:
         return AlchemyBase(
             uuid=entity.uuid.get(),
             table_name=entity.name,
@@ -46,8 +43,8 @@ class TestBaseDataMapper(DataMapper[DomainTestBase, AlchemyBase]):
         )
 
     @classmethod
-    def model_to_entity(cls, model: AlchemyBase) -> DomainTestBase:
-        return DomainTestBase(
+    def model_to_entity(cls, model: AlchemyBase) -> DomainBase:
+        return DomainBase(
             uuid=model.uuid,
             name=model.table_name,
             age=model.table_age,
@@ -55,7 +52,8 @@ class TestBaseDataMapper(DataMapper[DomainTestBase, AlchemyBase]):
         )
 
 
-engine = create_engine("sqlite:///:memory:")
+engine = create_engine("sqlite:///:memory:", echo=True)
+
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base.metadata.drop_all(bind=engine)
@@ -93,28 +91,24 @@ def _session():
     connection.close()
 
 
-class SqlTestUoW(SQLAlchemyUnitOfWork):
-    repo = TestBaseDataMapper
-
-
 @pytest.fixture
 def john_doe():
-    return DomainTestBase(uuid=uuid.uuid4(), name="John", age=25, email="gmail")
+    return DomainBase(uuid=uuid.uuid4(), name="John", age=25, email="gmail")
 
 
 @pytest.fixture
 def jane_doe():
-    return DomainTestBase(uuid=uuid.uuid4(), name="Jane", age=20, email="gmail")
+    return DomainBase(uuid=uuid.uuid4(), name="Jane", age=20, email="gmail")
 
 
 @pytest.fixture
 def john_smith():
-    return DomainTestBase(uuid=uuid.uuid4(), name="John", age=30, email="hotmail")
+    return DomainBase(uuid=uuid.uuid4(), name="John", age=30, email="hotmail")
 
 
 @pytest.fixture
 def jane_smith():
-    return DomainTestBase(uuid=uuid.uuid4(), name="Jane", age=35, email="hotmail")
+    return DomainBase(uuid=uuid.uuid4(), name="Jane", age=35, email="hotmail")
 
 
 @pytest.fixture
@@ -129,5 +123,4 @@ def session(_session, john_doe, jane_doe, john_smith, jane_smith):
     )
 
     _session.commit()
-
     return _session
