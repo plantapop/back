@@ -16,13 +16,13 @@ from plantapop.shared.infrastructure.repository.specification_mapper import (
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_1(database, john_smith):
+def test_specification_mapper_case_1(session, john_smith):
     # Given
     spec = Specification(filter=Equals("name", "John") & NotEqual("age", 25))
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(database.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 1
@@ -33,7 +33,7 @@ def test_specification_mapper_case_1(database, john_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_2(database, john_smith, jane_smith):
+def test_specification_mapper_case_2(session, john_smith, jane_smith):
     # Given
     spec = Specification(
         filter=NotEqual("age", 25) & Equals("name", "John")
@@ -42,7 +42,7 @@ def test_specification_mapper_case_2(database, john_smith, jane_smith):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(database.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 2
@@ -57,7 +57,7 @@ def test_specification_mapper_case_2(database, john_smith, jane_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_3(database):
+def test_specification_mapper_case_3(session):
     # Given
 
     spec = Specification(
@@ -67,7 +67,7 @@ def test_specification_mapper_case_3(database):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(database.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 4

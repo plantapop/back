@@ -6,6 +6,9 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 from plantapop.shared.domain.value_objects import GenericUUID
 from plantapop.shared.infrastructure.repository.data_mapper import DataMapper
+from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
+    SQLAlchemyUnitOfWork,
+)
 
 Base = declarative_base()
 
@@ -68,7 +71,7 @@ MAP = {
 
 
 @pytest.fixture
-def session():
+def _session():
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
@@ -88,6 +91,10 @@ def session():
 
     transaction.rollback()
     connection.close()
+
+
+class SqlTestUoW(SQLAlchemyUnitOfWork):
+    repo = TestBaseDataMapper
 
 
 @pytest.fixture
@@ -111,8 +118,8 @@ def jane_smith():
 
 
 @pytest.fixture
-def database(session, john_doe, jane_doe, john_smith, jane_smith):
-    session.add_all(
+def session(_session, john_doe, jane_doe, john_smith, jane_smith):
+    _session.add_all(
         [
             TestBaseDataMapper.entity_to_model(john_doe),
             TestBaseDataMapper.entity_to_model(jane_doe),
@@ -121,6 +128,6 @@ def database(session, john_doe, jane_doe, john_smith, jane_smith):
         ]
     )
 
-    session.commit()
+    _session.commit()
 
-    return session
+    return _session

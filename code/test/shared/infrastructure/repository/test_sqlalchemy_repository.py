@@ -17,6 +17,9 @@ from plantapop.shared.infrastructure.repository.specification_mapper import (
 from plantapop.shared.infrastructure.repository.sqlalchemy_repository import (
     SQLAlchemyRepository,
 )
+from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
+    SQLAlchemyUnitOfWork,
+)
 
 
 class AlchTestRep(SQLAlchemyRepository):
@@ -25,9 +28,14 @@ class AlchTestRep(SQLAlchemyRepository):
     model = AlchemyBase
 
 
+class SqlTestUoW(SQLAlchemyUnitOfWork):
+    repo = AlchTestRep
+
+
 @pytest.fixture
-def repository(database):
-    return AlchTestRep(database)
+def repository(session):
+    with SqlTestUoW(session) as repo:
+        yield repo
 
 
 @pytest.mark.integration
@@ -87,6 +95,7 @@ def test_save_repository(repository, john_smith):
 
     # When
     repository.save(new_persn)
+    repository.commit()
 
     # Then
     assert repository.get(new_persn.uuid).name == "John Smith"
@@ -108,6 +117,7 @@ def test_save_all_repository(repository, john_smith, jane_smith):
 
     # When
     repository.save_all([new_john_smith, new_jane_smith])
+    repository.commit()
 
     # Then
     assert repository.get(new_john_smith.uuid).name == "John Smith"
@@ -123,6 +133,7 @@ def test_update_repository(repository, john_smith):
 
     # When
     repository.update(john_smith)
+    repository.commit()
 
     # Then
     assert repository.get(john_smith.uuid).name == "John Smith"
@@ -138,6 +149,7 @@ def test_update_all_repository(repository, john_smith, jane_smith):
 
     # When
     repository.update_all([john_smith, jane_smith])
+    repository.commit()
 
     # Then
     assert repository.get(john_smith.uuid).name == "John Smith"
@@ -152,6 +164,7 @@ def test_delete_repository(repository, john_smith):
 
     # When
     repository.delete(john_smith)
+    repository.commit()
 
     # Then
     assert repository.get(john_smith.uuid) is None
@@ -165,6 +178,7 @@ def test_delete_all_repository(repository, john_smith, jane_smith):
 
     # When
     repository.delete_all([john_smith, jane_smith])
+    repository.commit()
 
     # Then
     assert repository.get(john_smith.uuid) is None

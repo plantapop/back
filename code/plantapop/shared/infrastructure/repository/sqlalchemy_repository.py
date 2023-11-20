@@ -1,7 +1,5 @@
 from typing import Dict, List, Type, TypeVar
 
-from sqlalchemy import delete as sa_delete
-from sqlalchemy import update as sa_update
 from sqlalchemy.orm import Session
 
 from plantapop.shared.domain.entities import Entity as DomainEntity
@@ -51,41 +49,29 @@ class SQLAlchemyRepository(GenericRepository):
     def save(self, entity: Entity) -> None:
         model = self.mapper.entity_to_model(entity)
         self._session.add(model)
-        self._session.commit()
         self.identity_map[entity.uuid] = entity
 
     def save_all(self, entities: List[Entity]) -> None:
-        models = [self.mapper.entity_to_model(entity) for entity in entities]
-        self._session.bulk_save_objects(models)
-        self._session.commit()
         for entity in entities:
-            self.identity_map[entity.uuid] = entity
+            self.save(entity)
 
     def update(self, entity: Entity) -> None:
         model = self.mapper.entity_to_model(entity)
         self._session.merge(model)
-        self._session.commit()
         self.identity_map[entity.uuid] = entity
 
     def update_all(self, entities: List[Entity]) -> None:
-        models = [self.mapper.entity_to_model(entity).__dict__ for entity in entities]
-        self._session.execute(sa_update(self.model), models)
-        self._session.commit()
         for entity in entities:
-            self.identity_map[entity.uuid] = entity
+            self.update(entity)
 
     def delete(self, entity: Entity) -> None:
         model = self._get_model(entity.uuid)
         self._session.delete(model)
-        self._session.commit()
         self._remove_from_identity_map(entity)
 
     def delete_all(self, entities: List[Entity]) -> None:
-        self._session.execute(
-            sa_delete(self.model).where(
-                self.model.uuid.in_([e.uuid.get() for e in entities])
-            )
-        )
+        for entity in entities:
+            self.delete(entity)
 
     def _remove_from_identity_map(self, entity: Entity) -> None:
         if entity.uuid in self.identity_map:
@@ -115,3 +101,6 @@ class SQLAlchemyRepository(GenericRepository):
         entity = self.mapper.model_to_entity(model)
         self.identity_map[entity.uuid] = entity
         return entity
+
+    def commit(self) -> None:
+        self._session.commit()

@@ -27,9 +27,29 @@ class GenericRepository(Generic[EntityUUID, Entity], metaclass=ABCMeta):
         pass
 
     @abstractmethod
+    def delete_all(self, entities: list[Entity]) -> None:
+        pass
+
+    @abstractmethod
     def exists(self, uuid: GenericUUID) -> bool:
         pass
 
     @abstractmethod
     def matching(self, specification: Specification) -> list[Entity]:
+        pass
+
+    @abstractmethod
+    def count(self, specification: Specification = None) -> int:
+        pass
+
+    @abstractmethod
+    def update(self, entity: Entity) -> None:
+        pass
+
+    @abstractmethod
+    def update_all(self, entities: list[Entity]) -> None:
+        pass
+
+    @abstractmethod
+    def commit(self) -> None:
         pass
