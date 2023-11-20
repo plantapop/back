@@ -1,5 +1,5 @@
 from datetime import datetime
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from jose import jwt
 
@@ -9,6 +9,7 @@ from plantapop.shared.domain.value_objects import GenericUUID
 class Token:
     def __init__(
         self,
+        uuid: UUID,
         token: str,
         user_uuid: UUID,
         token_type: str,
@@ -16,6 +17,7 @@ class Token:
         exp: datetime,
         revoked: bool,
     ):
+        self.uuid = GenericUUID(uuid)
         self.token = token
         self.user_uuid = GenericUUID(user_uuid)
         self.token_type = token_type
@@ -45,7 +47,7 @@ class Token:
             algorithm=algorithm,
         )
 
-        return cls(token, user_uuid, token_type, device, exp, revoked)
+        return cls(uuid4(), token, user_uuid, token_type, device, exp, revoked)
 
     def revoke(self) -> None:
         self.revoked = True
