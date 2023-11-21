@@ -9,3 +9,14 @@ postgres:
   url: postgresql+psycopg2://postgres:postgres@localhost:5432
   database: local_db 
 
+
+jwt:
+  key: super-secret-key 
+  algorithm: HS256
+
+  access:
+    duration: 86400
+
+  refresh:
+    duration: 86400
+    refresh_expiration_margin: 0
