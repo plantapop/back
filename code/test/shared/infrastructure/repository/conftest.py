@@ -1,8 +1,8 @@
 import uuid
 
 import pytest
-from sqlalchemy import Column, Integer, String, Uuid, create_engine, event
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import Column, Integer, String, Uuid
+from sqlalchemy.orm import declarative_base
 
 from plantapop.shared.domain.value_objects import GenericUUID
 from plantapop.shared.infrastructure.repository.data_mapper import DataMapper
@@ -52,43 +52,12 @@ class TestBaseDataMapper(DataMapper[DomainBase, AlchemyBase]):
         )
 
 
-engine = create_engine("sqlite:///:memory:", echo=True)
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
-
 MAP = {
     "uuid": "uuid",
     "name": "table_name",
     "age": "table_age",
     "email": "table_email",
 }
-
-
-@pytest.fixture
-def _session():
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-
-    nested = connection.begin_nested()
-
-    @event.listens_for(session, "after_transaction_end")
-    def end_savepoint(sess, trans):
-        nonlocal nested
-        if not nested.is_active:
-            nested = connection.begin_nested()
-
-    yield session
-
-    if session.is_active:
-        session.close()
-
-    transaction.rollback()
-    connection.close()
 
 
 @pytest.fixture
@@ -112,8 +81,9 @@ def jane_smith():
 
 
 @pytest.fixture
-def session(_session, john_doe, jane_doe, john_smith, jane_smith):
-    _session.add_all(
+def session(session, john_doe, jane_doe, john_smith, jane_smith):
+    Base.metadata.create_all(bind=session.bind)
+    session.add_all(
         [
             TestBaseDataMapper.entity_to_model(john_doe),
             TestBaseDataMapper.entity_to_model(jane_doe),
@@ -122,5 +92,5 @@ def session(_session, john_doe, jane_doe, john_smith, jane_smith):
         ]
     )
 
-    _session.commit()
-    return _session
+    session.commit()
+    return session

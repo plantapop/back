@@ -3,8 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class OrderType:
-    ASC = "ASC"
-    DESC = "DESC"
+    ASC = "asc"
+    DESC = "desc"
 
 
 class Order:

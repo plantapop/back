@@ -83,9 +83,9 @@ class SpecificationMapper:
             filters = self.map_filters(specification.filter)
             query = apply_filters(query, filters)
 
-        if specification.orders:
-            orders = self.map_orders(specification.orders)
-            query = apply_sort(query, orders)
+        if specification.order:
+            order = self.map_order(specification.order)
+            query = apply_sort(query, order)
 
         if specification.limit:
             query = query.limit(specification.limit)
@@ -102,7 +102,7 @@ class SpecificationMapper:
         criteria_processor = CriteriaProcessor(self.map)
         return [criteria_processor.to_filter_dict(filter)]
 
-    def map_orders(self, order: Order | None) -> list[Optional[Order]]:
+    def map_order(self, order: Order | None) -> list[Optional[Order]]:
         if order is None:
             return []
-        return [{"field": self.map[order.field], "direction": order.direction}]
+        return [{"field": self.map[order.field], "direction": order.order_type}]
