@@ -24,6 +24,7 @@ langcodes = "^3.3.0"
 pytz = "^2023.3.post1"
 bcrypt = "^4.0.1"
 sqlalchemy-filters = "^0.13.0"
+freezegun = "^1.2.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
@@ -48,7 +49,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.flake8]
 max-line-length = 88
-ignore = ["W292"]
+ignore = ["W292", "W503", "E203"]
 
 [tool.isort]
 profile = "black"

@@ -10,3 +10,6 @@ class Specification:
     order: Order | None = None
     limit: int | None = None
     offset: int | None = None
+
+    def is_satisfied_by(self, object: object) -> bool:
+        return self.filter.is_satisfied_by(object)

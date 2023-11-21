@@ -1,15 +1,19 @@
+from abc import ABCMeta
 from dataclasses import dataclass
+from typing import Generic, TypeVar
 from uuid import UUID, uuid4
+
+T = TypeVar("T")
 
 
 @dataclass(frozen=True)
-class GenericUUID:
-    value: UUID = uuid4()
+class ValueObject(Generic[T], metaclass=ABCMeta):
+    value: T
 
-    def get(self) -> UUID:
+    def get(self) -> T:
         return self.value
 
-    def __eq__(self, other: "GenericUUID") -> bool:
+    def __eq__(self, other: "ValueObject") -> bool:
         if hasattr(other, "value"):
             return self.value == other.value
         return False
@@ -22,3 +26,7 @@ class GenericUUID:
 
     def __hash__(self) -> int:
         return hash(self.value)
+
+
+class GenericUUID(ValueObject[UUID]):
+    value = uuid4()

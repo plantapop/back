@@ -14,6 +14,7 @@ from plantapop.shared.domain.specification.specification import (
     Order,
     Specification,
 )
+from plantapop.shared.domain.value_objects import ValueObject
 
 
 class CriteriaProcessor:
@@ -65,12 +66,17 @@ class CriteriaProcessor:
         return {"not": [inner_crit.to_filter_dict()]}
 
     def _process_filter_criteria(self, criteria: Criteria) -> dict:
+        value = criteria.value
+
+        if isinstance(criteria.value, ValueObject):
+            value = criteria.value.get()
+
         return {
             "field": self.map[
                 criteria.field
             ],  # Remember, this is the mapper from Domain Criteria to Infrastructure Criteria # noqa
             "op": criteria.operator,
-            "value": criteria.value,
+            "value": value,
         }
 
 
@@ -96,7 +102,6 @@ class SpecificationMapper:
         return query
 
     def map_filters(self, filter: Filter | None) -> list[Optional[Filter]]:
-        print(Specification.filter)
         if filter is None:
             return []
         criteria_processor = CriteriaProcessor(self.map)
