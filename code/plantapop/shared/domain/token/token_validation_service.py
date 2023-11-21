@@ -4,12 +4,12 @@ from jose.exceptions import JWTError
 from plantapop.shared.domain.specification.filter import Equals
 from plantapop.shared.domain.specification.specification import Specification
 from plantapop.shared.domain.token.token import Token
-from plantapop.shared.domain.token.token_repository import TokenRepository
+from plantapop.shared.domain.repositories import GenericRepository
 
 
 class TokenValidationService:
     def __init__(
-        self, key: str, algorithm: str, repository: TokenRepository | None = None
+        self, key: str, algorithm: str, repository: GenericRepository | None = None
     ):
         self.repository = repository
         self.key = key
