@@ -1,4 +1,4 @@
-from test.shared.domain.token.token_mother import RefreshTokenMother
+from test.shared.domain.token.token_mother import TokenMother
 from uuid import uuid4
 
 import pytest
@@ -15,11 +15,11 @@ CONFIGMAP = Config.get_instance()
 def refresh_token(unit_of_work):
     with unit_of_work as repo:
         user = {"uuid": uuid4(), "device": "device"}
-        valid_refresh = RefreshTokenMother.create(
+        valid_refresh = TokenMother.create(
             user_uuid=user["uuid"], device=user["device"]
         )
         user = {"uuid": uuid4(), "device": "device"}
-        invalid_refresh = RefreshTokenMother.create(
+        invalid_refresh = TokenMother.create(
             user_uuid=user["uuid"], device=user["device"], revoked=True
         )
         repo.save(valid_refresh)

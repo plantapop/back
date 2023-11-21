@@ -6,7 +6,10 @@ CONFIGMAP = Config.get_instance()
 
 
 def get_base():
-    from plantapop.shared.infrastructure.repository.database import Base
+    from plantapop.shared.infrastructure.repository.database import Base  # noqa
+    from plantapop.shared.infrastructure.token.token_repository import (  # noqa
+        RefreshToken,
+    )
 
     return Base
 

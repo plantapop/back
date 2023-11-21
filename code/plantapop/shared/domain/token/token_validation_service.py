@@ -1,10 +1,10 @@
 from jose import jwt
 from jose.exceptions import JWTError
 
+from plantapop.shared.domain.repositories import GenericRepository
 from plantapop.shared.domain.specification.filter import Equals
 from plantapop.shared.domain.specification.specification import Specification
 from plantapop.shared.domain.token.token import Token
-from plantapop.shared.domain.repositories import GenericRepository
 
 
 class TokenValidationService:

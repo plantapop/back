@@ -15,8 +15,7 @@ Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
 
 
-@pytest.fixture
-def session():
+def _session():
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
@@ -40,10 +39,20 @@ def session():
         connection.close()
 
 
+@pytest.fixture
+def session():
+    yield from _session()
+
+
+class SessionFactory(providers.Factory):
+    def __init__(self):
+        super().__init__(_session)
+
+
 class IntegrationTestContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(modules=[sqlalchemy_uow])
 
-    session = providers.Resource(session)
+    session = providers.Resource(_session)
 
 
 intefration_container = IntegrationTestContainer()
@@ -52,3 +61,9 @@ intefration_container = IntegrationTestContainer()
 @pytest.fixture
 def container():
     return intefration_container
+
+
+@pytest.fixture
+def isolated(container, session):
+    with container.session.override(session):
+        yield

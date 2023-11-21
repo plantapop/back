@@ -1,4 +1,4 @@
-from test.shared.domain.token.token_mother import RefreshTokenMother
+from test.shared.domain.token.token_mother import TokenMother
 from uuid import uuid4
 
 import pytest
@@ -18,10 +18,10 @@ def revoke_all(unit_of_work):
     with unit_of_work as repo:
         repo.save_all(
             [
-                RefreshTokenMother.create(user_uuid=uuid, device="a"),
-                RefreshTokenMother.create(user_uuid=uuid, device="b"),
-                RefreshTokenMother.create(user_uuid=uuid, device="c"),
-                RefreshTokenMother.create(user_uuid=uuid, device="d"),
+                TokenMother.create(user_uuid=uuid, device="a"),
+                TokenMother.create(user_uuid=uuid, device="b"),
+                TokenMother.create(user_uuid=uuid, device="c"),
+                TokenMother.create(user_uuid=uuid, device="d"),
             ]
         )
 

@@ -8,7 +8,7 @@ from plantapop.shared.domain.token.token import Token
 CONFIGMAP = Config.get_instance()
 
 
-class RefreshTokenMother:
+class TokenMother:
     @staticmethod
     def create(
         user_uuid: UUID = uuid4(),

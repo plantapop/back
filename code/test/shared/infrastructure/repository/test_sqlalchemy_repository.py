@@ -33,10 +33,9 @@ class SqlTestUoW(SQLAlchemyUnitOfWork):
 
 
 @pytest.fixture
-def repository(container, session):
-    with container.session.override(session):
-        with SqlTestUoW() as repo:
-            yield repo
+def repository(isolated):
+    with SqlTestUoW() as repo:
+        yield repo
 
 
 @pytest.mark.integration

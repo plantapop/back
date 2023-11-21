@@ -1,4 +1,4 @@
-from test.shared.domain.token.token_mother import RefreshTokenMother
+from test.shared.domain.token.token_mother import TokenMother
 from uuid import uuid4
 
 import pytest
@@ -14,11 +14,11 @@ def validator():
     a_uuid = uuid4()
     b_uuid = uuid4()
 
-    a_r = RefreshTokenMother.create(user_uuid=a_uuid, device="a")
-    b_r = RefreshTokenMother.create(user_uuid=b_uuid, device="b")
+    a_r = TokenMother.create(user_uuid=a_uuid, device="a")
+    b_r = TokenMother.create(user_uuid=b_uuid, device="b")
 
-    a_a = RefreshTokenMother.create(user_uuid=a_uuid, device="a", token_type="access")
-    b_a = RefreshTokenMother.create(user_uuid=b_uuid, device="b", token_type="access")
+    a_a = TokenMother.create(user_uuid=a_uuid, device="a", token_type="access")
+    b_a = TokenMother.create(user_uuid=b_uuid, device="b", token_type="access")
 
     return {
         "a": {
