@@ -25,7 +25,6 @@ class Config:
 
     @classmethod
     def get_instance(cls) -> DictConfig | ListConfig:
-        with cls._lock:
-            if cls._instance is None:
-                cls._instance = cls._load_config()
+        if cls._instance is None:
+            cls._instance = cls._load_config()
         return cls._instance

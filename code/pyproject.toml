@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "plantapop"
 version = "0.1.0"
-description = "El núcleo de Plantacity, una aplicación para la venta e intercambio de esquejes de plantas."
+description = "El núcleo de Plantacity, una aplicación para la venta e intercambio de plantas."
 authors = ["pablo-snz <pablo.snz.brm@gmail.com>"]
 license = "MIT License"
 
