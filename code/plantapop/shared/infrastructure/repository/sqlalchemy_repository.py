@@ -18,7 +18,7 @@ EntityUUID = TypeVar("EntityUUID", bound=GenericUUID)
 
 class SQLAlchemyRepository(GenericRepository):
     specification_mapper: SpecificationMapper
-    mapper: Type[DataMapper[DomainEntity, Base]]
+    mapper: DataMapper[DomainEntity, Base]
     model: Type[Base]
 
     def __init__(
