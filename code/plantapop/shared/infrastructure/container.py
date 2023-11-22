@@ -15,9 +15,11 @@ class SessionContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(modules=[endpoints, sqlalchemy_uow])
 
     session = providers.Factory(
-        lambda: orm.sessionmaker(
-            bind=engine,
-            autocommit=False,
-            autoflush=False,
-        )()
+        lambda: orm.scoped_session(
+            orm.sessionmaker(
+                bind=engine,
+                autocommit=False,
+                autoflush=False,
+            )
+        )
     )
