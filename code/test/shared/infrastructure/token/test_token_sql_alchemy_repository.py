@@ -12,7 +12,7 @@ from plantapop.shared.infrastructure.token.token_repository import (
 
 
 @pytest.fixture
-def refresh_token(isolated):
+def refresh_token(i_session):
     return TokenMother.create()
 
 

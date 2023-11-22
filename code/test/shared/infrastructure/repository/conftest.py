@@ -80,10 +80,11 @@ def jane_smith():
     return DomainBase(uuid=uuid.uuid4(), name="Jane", age=35, email="hotmail")
 
 
+# Override the session fixture from test/integration_fixtures.py to add the test data
 @pytest.fixture
-def session(session, john_doe, jane_doe, john_smith, jane_smith):
-    Base.metadata.create_all(bind=session.bind)
-    session.add_all(
+def i_session(i_session, john_doe, jane_doe, john_smith, jane_smith):
+    Base.metadata.create_all(bind=i_session.bind)
+    i_session.add_all(
         [
             TestBaseDataMapper.entity_to_model(john_doe),
             TestBaseDataMapper.entity_to_model(jane_doe),
@@ -92,5 +93,5 @@ def session(session, john_doe, jane_doe, john_smith, jane_smith):
         ]
     )
 
-    session.commit()
-    return session
+    i_session.commit()
+    return i_session

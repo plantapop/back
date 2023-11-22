@@ -33,7 +33,7 @@ class SqlTestUoW(SQLAlchemyUnitOfWork):
 
 
 @pytest.fixture
-def repository(isolated):
+def repository(i_session):
     with SqlTestUoW() as repo:
         yield repo
 

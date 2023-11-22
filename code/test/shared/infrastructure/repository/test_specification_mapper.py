@@ -19,13 +19,13 @@ from plantapop.shared.infrastructure.repository.specification_mapper import (
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_1(session, john_smith):
+def test_specification_mapper_case_1(i_session, john_smith):
     # Given
     spec = Specification(filter=Equals("name", "John") & NotEqual("age", 25))
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 1
@@ -36,7 +36,7 @@ def test_specification_mapper_case_1(session, john_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_2(session, john_smith, jane_smith):
+def test_specification_mapper_case_2(i_session, john_smith, jane_smith):
     # Given
     spec = Specification(
         filter=NotEqual("age", 25) & Equals("name", "John")
@@ -45,7 +45,7 @@ def test_specification_mapper_case_2(session, john_smith, jane_smith):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 2
@@ -60,7 +60,7 @@ def test_specification_mapper_case_2(session, john_smith, jane_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_3(session):
+def test_specification_mapper_case_3(i_session):
     # Given
 
     spec = Specification(
@@ -70,14 +70,14 @@ def test_specification_mapper_case_3(session):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 4
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_4(session, jane_smith):
+def test_specification_mapper_case_4(i_session, jane_smith):
     # Given
     spec = Specification(
         filter=NotContains("email", ["gmail"]) & GreaterThan("age", 20),
@@ -87,7 +87,7 @@ def test_specification_mapper_case_4(session, jane_smith):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 1
@@ -96,7 +96,7 @@ def test_specification_mapper_case_4(session, jane_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_5(session, john_smith):
+def test_specification_mapper_case_5(i_session, john_smith):
     # Given
     spec = Specification(
         filter=NotContains("email", ["gmail"]) & GreaterThan("age", 20),
@@ -107,7 +107,7 @@ def test_specification_mapper_case_5(session, john_smith):
 
     # When
     mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(session.query(AlchemyBase), spec).all()
+    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
 
     # Then
     assert len(query) == 1

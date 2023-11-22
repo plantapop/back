@@ -19,7 +19,7 @@ Base.metadata.create_all(bind=engine)
 
 
 @pytest.fixture()
-def session():
+def client():
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
@@ -32,16 +32,13 @@ def session():
         if not nested.is_active:
             nested = connection.begin_nested()
 
-    yield session
+    try:
+        with app.session.session.override(session):
+            yield TestClient(app)
 
-    if session.is_active:
-        session.close()
+    finally:
+        if session.is_active:
+            session.close()
 
-    transaction.rollback()
-    connection.close()
-
-
-@pytest.fixture()
-def client(session):
-    with app.session.session.override(session):
-        yield TestClient(app)
+        transaction.rollback()
+        connection.close()
