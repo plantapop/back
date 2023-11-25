@@ -1,5 +1,5 @@
-from plantapop.shared.domain.bus.event import DomainEvent
-from plantapop.shared.domain.bus.event_bus import EventBus
+from plantapop.shared.domain.event.event import DomainEvent
+from plantapop.shared.domain.event.event_bus import EventBus
 
 
 class InMemoryEventBus(EventBus):

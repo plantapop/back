@@ -2,7 +2,7 @@ from plantapop.accounts.domain.repository import UserRepository
 from plantapop.accounts.domain.services import check_email, check_uuid
 from plantapop.accounts.domain.user import User
 from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
-from plantapop.shared.domain.bus.event_bus import EventBus
+from plantapop.shared.domain.event.event_bus import EventBus
 
 
 class CreateUserCommandHandler:

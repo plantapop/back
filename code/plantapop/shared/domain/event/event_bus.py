@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from plantapop.shared.domain.bus.event import DomainEvent
+from plantapop.shared.domain.event.event import DomainEvent
 
 
 class EventBus(ABC):
