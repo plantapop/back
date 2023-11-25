@@ -1,4 +1,4 @@
-from plantapop.shared.domain.event.event import DomainEvent
+from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.domain.value_objects import GenericUUID
 
 
