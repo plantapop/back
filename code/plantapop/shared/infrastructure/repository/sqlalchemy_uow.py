@@ -1,6 +1,7 @@
 from typing import Type
 
 from dependency_injector.wiring import Provide, inject
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from plantapop.shared.domain.unit_of_work import UnitOfWork
 from plantapop.shared.infrastructure.repository.sqlalchemy_repository import (
@@ -12,24 +13,29 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
     repo = Type[SQLAlchemyRepository]
 
     @inject
-    def __init__(self, db_session=Provide["session"]):
+    def __init__(self, db_session: AsyncSession = Provide["session"]):
+        # https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncSession.begin
         self._session = db_session
         self.repo = self.repo(self._session)
 
-    def __enter__(self) -> SQLAlchemyRepository:
+    async def __aenter__(self) -> SQLAlchemyRepository:
+        self.transaction = self._session.begin()
         return self.repo
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
-            self.commit()
+            await self.commit()
         else:
-            self.rollback()
+            await self.rollback()
 
-    def commit(self):
-        self.repo.commit()
+        await self.close()
 
-    def rollback(self):
-        self._session.rollback()
+    async def commit(self):
+        await self._session.commit()
 
-    def close(self):
-        self._session.close()
+    async def rollback(self):
+        await self._session.rollback()
+
+    async def close(self):
+        self.transaction.close()
+        await self._session.close()

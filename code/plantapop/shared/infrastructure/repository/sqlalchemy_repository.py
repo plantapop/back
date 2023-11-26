@@ -1,6 +1,8 @@
 from typing import Dict, List, Type, TypeVar
 
-from sqlalchemy.orm import Session
+from sqlalchemy import func
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from plantapop.shared.domain.entities import Entity as DomainEntity
 from plantapop.shared.domain.repositories import GenericRepository
@@ -22,78 +24,86 @@ class SQLAlchemyRepository(GenericRepository):
     model: Type[Base]
 
     def __init__(
-        self, db_session: Session, identity_map: Dict[GenericUUID, DomainEntity] = None
+        self,
+        db_session: AsyncSession,
+        identity_map: Dict[GenericUUID, DomainEntity] = None,
     ):
         self._session = db_session
         self.identity_map = identity_map or dict()
 
-    def get(self, uuid: GenericUUID) -> Entity:
+    async def get(self, uuid: GenericUUID) -> Entity:
         if uuid in self.identity_map:
             return self.identity_map[uuid]
         else:
-            model = self._get_model(uuid)
+            model = await self._get_model(uuid)
             if not model:
                 return None
             entity = self.mapper.model_to_entity(model)
             return entity
 
-    def _get_model(self, uuid: GenericUUID) -> Base:
-        return self._session.get(self.model, uuid.get())
+    async def _get_model(self, uuid: GenericUUID) -> Base:
+        return await self._session.get(self.model, uuid.get())
 
-    def count(self, specification: Specification = None) -> int:
-        query = self._session.query(self.model)
+    async def count(self, specification: Specification = None) -> int:
+        query = select(func.count()).select_from(self.model)
         if specification:
             query = self.specification_mapper.apply(query, specification)
-        return query.count()
+        count = await self._session.execute(query)
+        return count.scalar()
 
-    def save(self, entity: Entity) -> None:
+    async def save(self, entity: Entity) -> None:
         model = self.mapper.entity_to_model(entity)
         self._session.add(model)
         self.identity_map[entity.uuid] = entity
 
-    def save_all(self, entities: List[Entity]) -> None:
+    async def save_all(self, entities: List[Entity]) -> None:
         for entity in entities:
-            self.save(entity)
+            await self.save(entity)
 
-    def update(self, entity: Entity) -> None:
+    async def update(self, entity: Entity) -> None:
         model = self.mapper.entity_to_model(entity)
         self._session.merge(model)
         self.identity_map[entity.uuid] = entity
 
-    def update_all(self, entities: List[Entity]) -> None:
+    async def update_all(self, entities: List[Entity]) -> None:
         for entity in entities:
-            self.update(entity)
+            await self.update(entity)
 
-    def delete(self, entity: Entity) -> None:
-        model = self._get_model(entity.uuid)
+    async def delete(self, entity: Entity) -> None:
+        model = await self._get_model(entity.uuid)
         self._session.delete(model)
         self._remove_from_identity_map(entity)
 
-    def delete_all(self, entities: List[Entity]) -> None:
+    async def delete_all(self, entities: List[Entity]) -> None:
         for entity in entities:
-            self.delete(entity)
+            await self.delete(entity)
 
     def _remove_from_identity_map(self, entity: Entity) -> None:
         if entity.uuid in self.identity_map:
             del self.identity_map[entity.uuid]
 
-    def exists(self, uuid: GenericUUID = None, spec: Specification = None) -> bool:
+    async def exists(
+        self, uuid: GenericUUID = None, spec: Specification = None
+    ) -> bool:
         if uuid:
             if uuid in self.identity_map:
                 return True
-            return self._get_model(uuid) is not None
+            return await self._get_model(uuid) is not None
 
         if spec:
-            query = self._session.query(self.model)
+            query = select(self.model)
             query = self.specification_mapper.apply(query, spec)
-            return query.first() is not None
+            # get first result
+            first = await self._session.execute(query)
+            return first.scalar() is not None
 
         raise ValueError("uuid or specification must be provided")
 
-    def matching(self, spec: Specification) -> List[Entity]:
-        query = self._session.query(self.model)
+    async def matching(self, spec: Specification) -> List[Entity]:
+        query = select(self.model)
         query = self.specification_mapper.apply(query, spec)
-        models = query.all()
+        models = await self._session.execute(query)
+        models = models.scalars().all()
         entities = [self._map_model_to_entity(model) for model in models]
         return entities
 
@@ -102,5 +112,5 @@ class SQLAlchemyRepository(GenericRepository):
         self.identity_map[entity.uuid] = entity
         return entity
 
-    def commit(self) -> None:
-        self._session.commit()
+    async def commit(self) -> None:
+        await self._session.commit()

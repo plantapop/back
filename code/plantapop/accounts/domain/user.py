@@ -9,8 +9,8 @@ from plantapop.accounts.domain.value_objects.user_prefered_languages import (
 )
 from plantapop.accounts.domain.value_objects.user_surnames import UserSurnames
 from plantapop.accounts.domain.value_objects.user_timezone import UserTimezone
-from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.domain.entities import Entity
+from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.domain.value_objects import GenericUUID
 
 

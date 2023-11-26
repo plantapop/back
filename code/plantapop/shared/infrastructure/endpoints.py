@@ -1,7 +1,7 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm.session import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql.expression import text
 
 from plantapop.accounts.infrastructure.controller import router as accounts_router
@@ -11,10 +11,12 @@ base_router = APIRouter()
 
 @base_router.get("/readiness")
 @inject
-async def readiness(session: Session = Depends(Provide["session"])) -> JSONResponse:
-    assert isinstance(session, Session)
+async def readiness(
+    session: AsyncSession = Depends(Provide["session"]),
+) -> JSONResponse:
+    assert isinstance(session, AsyncSession)
     try:
-        session.execute(text("SELECT 1"))
+        await session.execute(text("SELECT 1"))
         response_data = {"status": "OK"}
         status_code = 200
     except Exception as e:
