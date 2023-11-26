@@ -6,7 +6,7 @@ ENVIRONMENT: development
 LOG_LEVEL: debug
 
 postgres:
-  url: postgresql+psycopg2://postgres:postgres@localhost:5432
+  url: postgresql+asyncpg://postgres:postgres@localhost:5432
   database: local_db 
 
 

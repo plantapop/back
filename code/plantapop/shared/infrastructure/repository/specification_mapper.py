@@ -1,7 +1,7 @@
 from sqlalchemy import and_, asc, desc, not_, or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.sql.elements import BooleanClauseList, OrderByClause
+from sqlalchemy.sql.elements import BooleanClauseList
 
 from plantapop.shared.domain.specification.criteria import (
     Criteria,
@@ -10,7 +10,7 @@ from plantapop.shared.domain.specification.criteria import (
     _NotCriteria,
 )
 from plantapop.shared.domain.specification.filter import Operators
-from plantapop.shared.domain.specification.Order import OrderType
+from plantapop.shared.domain.specification.order import OrderType
 from plantapop.shared.domain.specification.specification import (
     Filter,
     Order,
@@ -94,7 +94,7 @@ class SpecificationMapper:
 
         return query
 
-    def map_order(self, order: Order | None) -> OrderByClause:
+    def map_order(self, order: Order | None):
         if order.order_type == OrderType.ASC:
             return asc(self.map[order.field])
         elif order.order_type == OrderType.DESC:

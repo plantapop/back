@@ -1,6 +1,7 @@
 import uvicorn
 
-from plantapop import CONFIGMAP, create_app
+from plantapop import CONFIGMAP, create_app, init_models
+import asyncio
 
 app = create_app()
 
@@ -16,4 +17,5 @@ def main():
 
 
 if __name__ == "__main__":
+    asyncio.run(init_models())
     main()
