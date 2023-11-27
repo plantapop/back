@@ -1,7 +1,8 @@
 import uuid
 
 import pytest
-from sqlalchemy import Column, Integer, String, Uuid
+import pytest_asyncio
+from sqlalchemy import Column, Integer, String, Uuid, select
 from sqlalchemy.orm import declarative_base
 
 from plantapop.shared.domain.value_objects import GenericUUID
@@ -53,10 +54,10 @@ class TestBaseDataMapper(DataMapper[DomainBase, AlchemyBase]):
 
 
 MAP = {
-    "uuid": "uuid",
-    "name": "table_name",
-    "age": "table_age",
-    "email": "table_email",
+    "uuid": AlchemyBase.uuid,
+    "name": AlchemyBase.table_name,
+    "age": AlchemyBase.table_age,
+    "email": AlchemyBase.table_email
 }
 
 
@@ -81,10 +82,11 @@ def jane_smith():
 
 
 # Override the session fixture from test/integration_fixtures.py to add the test data
-@pytest.fixture
-def i_session(i_session, john_doe, jane_doe, john_smith, jane_smith):
-    Base.metadata.create_all(bind=i_session.bind)
-    i_session.add_all(
+@pytest_asyncio.fixture
+async def asession(connection_and_session, john_doe, jane_doe, john_smith, jane_smith):
+    session, conn = connection_and_session
+    await conn.run_sync(Base.metadata.create_all)
+    session.add_all(
         [
             TestBaseDataMapper.entity_to_model(john_doe),
             TestBaseDataMapper.entity_to_model(jane_doe),
@@ -93,5 +95,8 @@ def i_session(i_session, john_doe, jane_doe, john_smith, jane_smith):
         ]
     )
 
-    i_session.commit()
-    return i_session
+    await session.commit()
+    yield session
+
+
+
