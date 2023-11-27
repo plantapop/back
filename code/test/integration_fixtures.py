@@ -41,11 +41,8 @@ async def connection_and_session():
     trans = await conn.begin()
     session = AsyncSession(bind=conn)
 
-    # start the session in a SAVEPOINT...
     await conn.begin_nested()
 
-    # then each time that SAVEPOINT ends, reopen it
-    # NOTE: no async listeners yet
     @event.listens_for(session.sync_session, "after_transaction_end")
     def restart_savepoint(session, transaction):
         if transaction.nested and not transaction._parent.nested:
@@ -54,7 +51,6 @@ async def connection_and_session():
     with container.session.override(session):
         yield session, conn
 
-    # same teardown from the docs
     await session.close()
     await trans.rollback()
     await conn.close()

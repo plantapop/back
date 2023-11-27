@@ -2,7 +2,7 @@ import uuid
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import Column, Integer, String, Uuid, select
+from sqlalchemy import Column, Integer, String, Uuid
 from sqlalchemy.orm import declarative_base
 
 from plantapop.shared.domain.value_objects import GenericUUID
@@ -57,7 +57,7 @@ MAP = {
     "uuid": AlchemyBase.uuid,
     "name": AlchemyBase.table_name,
     "age": AlchemyBase.table_age,
-    "email": AlchemyBase.table_email
+    "email": AlchemyBase.table_email,
 }
 
 
@@ -81,7 +81,6 @@ def jane_smith():
     return DomainBase(uuid=uuid.uuid4(), name="Jane", age=35, email="hotmail")
 
 
-# Override the session fixture from test/integration_fixtures.py to add the test data
 @pytest_asyncio.fixture
 async def asession(connection_and_session, john_doe, jane_doe, john_smith, jane_smith):
     session, conn = connection_and_session
@@ -97,6 +96,3 @@ async def asession(connection_and_session, john_doe, jane_doe, john_smith, jane_
 
     await session.commit()
     yield session
-
-
-
