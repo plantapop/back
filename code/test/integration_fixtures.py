@@ -18,7 +18,7 @@ class Test(Base):
     name = Column(String)
 
 
-engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=True)
+engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
 )
