@@ -12,8 +12,8 @@ CONFIGMAP = Config.get_instance()
 
 
 @pytest.fixture
-def refresh_token(unit_of_work):
-    with unit_of_work as repo:
+async def refresh_token(unit_of_work):
+    async with unit_of_work as repo:
         user = {"uuid": uuid4(), "device": "device"}
         valid_refresh = TokenMother.create(
             user_uuid=user["uuid"], device=user["device"]
@@ -22,8 +22,8 @@ def refresh_token(unit_of_work):
         invalid_refresh = TokenMother.create(
             user_uuid=user["uuid"], device=user["device"], revoked=True
         )
-        repo.save(valid_refresh)
-        repo.save(invalid_refresh)
+        await repo.save(valid_refresh)
+        await repo.save(invalid_refresh)
 
     rt = RefreshToken()
     rt.uow = unit_of_work
@@ -38,13 +38,13 @@ def refresh_token(unit_of_work):
 
 @pytest.mark.unit
 @freeze_time("2021-01-01")
-def test_refresh_token(refresh_token):
+async def test_refresh_token(refresh_token):
     # Given
     token = refresh_token["valid"]
     command = refresh_token["command"]
 
     # When
-    response = command.execute(token)
+    response = await command.execute(token)
 
     # Then
     assert response["access"]
@@ -54,23 +54,23 @@ def test_refresh_token(refresh_token):
 
 @pytest.mark.unit
 @freeze_time("2021-01-01")
-def test_refresh_token_revoked(refresh_token):
+async def test_refresh_token_revoked(refresh_token):
     # Given
     token = refresh_token["invalid"]
     command = refresh_token["command"]
 
     # When / Then
     with pytest.raises(InvalidTokenException):
-        command.execute(token)
+        await command.execute(token)
 
 
 @pytest.mark.unit
 @freeze_time("2021-01-01")
-def test_refresh_token_invalid(refresh_token):
+async def test_refresh_token_invalid(refresh_token):
     # Given
     command = refresh_token["command"]
     token = "invalid"
 
     # When / Then
     with pytest.raises(InvalidTokenException):
-        command.execute(token)
+        await command.execute(token)

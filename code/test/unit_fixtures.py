@@ -12,28 +12,28 @@ class FakeRepository(GenericRepository):
     def __init__(self) -> None:
         self._db: dict[GenericUUID, Entity] = {}
 
-    def get(self, uuid: GenericUUID) -> Entity:
+    async def get(self, uuid: GenericUUID) -> Entity:
         return self._db.get(uuid)
 
-    def save(self, entity: Entity) -> None:
+    async def save(self, entity: Entity) -> None:
         self._db[entity.uuid] = entity
 
-    def save_all(self, entities: list[Entity]) -> None:
+    async def save_all(self, entities: list[Entity]) -> None:
         for entity in entities:
-            self.save(entity)
+            await self.save(entity)
 
-    def delete(self, entity: Entity) -> None:
+    async def delete(self, entity: Entity) -> None:
         if entity.uuid in self._db:
             del self._db[entity.uuid]
 
-    def delete_all(self, entities: list[Entity]) -> None:
+    async def delete_all(self, entities: list[Entity]) -> None:
         for entity in entities:
-            self.delete(entity)
+            await self.delete(entity)
 
-    def exists(self, uuid: GenericUUID) -> bool:
+    async def exists(self, uuid: GenericUUID) -> bool:
         return uuid in self._db
 
-    def matching(self, specification: Specification) -> list[Entity]:
+    async def matching(self, specification: Specification) -> list[Entity]:
         list_matching_filter = [
             entity
             for entity in self._db.values()
@@ -57,20 +57,20 @@ class FakeRepository(GenericRepository):
         field_value = getattr(entity, order.field)
         return field_value if order.order_type == OrderType.ASC else -field_value
 
-    def count(self, specification: Specification = None) -> int:
+    async def count(self, specification: Specification = None) -> int:
         if specification:
             return len(self.matching(specification))
         return len(self._db)
 
-    def update(self, entity: Entity) -> None:
+    async def update(self, entity: Entity) -> None:
         if entity.uuid in self._db:
             self._db[entity.uuid] = entity
 
-    def update_all(self, entities: list[Entity]) -> None:
+    async def update_all(self, entities: list[Entity]) -> None:
         for entity in entities:
-            self.update(entity)
+            await self.update(entity)
 
-    def commit(self) -> None:
+    async def commit(self) -> None:
         pass
 
 
@@ -78,19 +78,19 @@ class FakeUnitOfWork(UnitOfWork):
     def __init__(self) -> None:
         self.repo = FakeRepository()
 
-    def __enter__(self) -> FakeRepository:
+    async def __aenter__(self) -> FakeRepository:
         return self.repo
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.commit()
-
-    def commit(self):
-        self.repo.commit()
-
-    def rollback(self):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         pass
 
-    def close(self):
+    async def commit(self):
+        pass
+
+    async def rollback(self):
+        pass
+
+    async def close(self):
         pass
 
 

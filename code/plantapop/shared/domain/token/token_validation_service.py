@@ -29,9 +29,9 @@ class TokenValidationService:
         except JWTError:
             return False
 
-    def is_revoked(self, token: str) -> bool:
-        self.token: Token = self.repository.matching(
-            Specification(filter=Equals("token", token))
+    async def is_revoked(self, token: str) -> bool:
+        self.token: Token = (
+            await self.repository.matching(Specification(filter=Equals("token", token)))
         )[0]
 
         return self.token.is_revoked()

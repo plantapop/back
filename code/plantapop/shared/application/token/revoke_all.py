@@ -10,9 +10,9 @@ class RevokeAll:
     def __init__(self):
         self.uow = RefreshTokenUoW()
 
-    def execute(self, user_uuid: UUID) -> None:
-        with self.uow as repo:
-            tokens: list[Token] = repo.matching(
+    async def execute(self, user_uuid: UUID) -> None:
+        async with self.uow as repo:
+            tokens: list[Token] = await repo.matching(
                 Specification(
                     filter=Equals("user_uuid", user_uuid) & Equals("revoked", False)
                 )
@@ -20,4 +20,4 @@ class RevokeAll:
             for token in tokens:
                 token.revoke()
 
-            repo.save_all(tokens)
+            await repo.save_all(tokens)

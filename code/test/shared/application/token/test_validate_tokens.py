@@ -36,32 +36,32 @@ def validator():
 
 
 @pytest.mark.unit
-def test_validate_token(validator):
+async def test_validate_token(validator):
     # Given
     token = validator["a"]["access"].token
 
     # When
-    uuid = validator["command"].execute(token)
+    uuid = await validator["command"].execute(token)
 
     # Then
     assert uuid == validator["a"]["uuid"]
 
 
 @pytest.mark.unit
-def test_validate_refresh_token_invalid(validator):
+async def test_validate_refresh_token_invalid(validator):
     # Given
     token = validator["a"]["refresh"].token
 
     # When
     with pytest.raises(Exception):
-        validator["command"].execute(token)
+        await validator["command"].execute(token)
 
 
 @pytest.mark.unit
-def test_validate_access_token_invalid(validator):
+async def test_validate_access_token_invalid(validator):
     # Given
     token = validator["a"]["access"].token + "invalid"
 
     # When
     with pytest.raises(Exception):
-        validator["command"].execute(token)
+        await validator["command"].execute(token)
