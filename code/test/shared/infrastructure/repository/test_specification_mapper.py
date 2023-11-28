@@ -1,7 +1,7 @@
 from test.shared.infrastructure.repository.conftest import MAP, AlchemyBase
 
 import pytest
-from sqlalchemy.orm import Query
+from sqlalchemy import select
 
 from plantapop.shared.domain.specification.filter import (
     Contains,
@@ -19,13 +19,15 @@ from plantapop.shared.infrastructure.repository.specification_mapper import (
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_1(i_session, john_smith):
+async def test_specification_mapper_case_1(asession, john_smith):
     # Given
     spec = Specification(filter=Equals("name", "John") & NotEqual("age", 25))
 
     # When
-    mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
+    raw = await asession.execute(
+        SpecificationMapper(MAP).apply(select(AlchemyBase), spec)
+    )
+    query = raw.scalars().all()
 
     # Then
     assert len(query) == 1
@@ -36,7 +38,7 @@ def test_specification_mapper_case_1(i_session, john_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_2(i_session, john_smith, jane_smith):
+async def test_specification_mapper_case_2(asession, john_smith, jane_smith):
     # Given
     spec = Specification(
         filter=NotEqual("age", 25) & Equals("name", "John")
@@ -44,8 +46,10 @@ def test_specification_mapper_case_2(i_session, john_smith, jane_smith):
     )
 
     # When
-    mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
+    raw = await asession.execute(
+        SpecificationMapper(MAP).apply(select(AlchemyBase), spec)
+    )
+    query = raw.scalars().all()
 
     # Then
     assert len(query) == 2
@@ -60,24 +64,28 @@ def test_specification_mapper_case_2(i_session, john_smith, jane_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_3(i_session):
+async def test_specification_mapper_case_3(asession):
     # Given
 
     spec = Specification(
         filter=Equals("name", "John")
-        | (NotEqual("age", 25) | (Contains("email", ["hotmail"]) & LessThan("age", 35)))  # noqa
+        | (
+            NotEqual("age", 25) | (Contains("email", ["hotmail"]) & LessThan("age", 35))
+        )  # noqa
     )
 
     # When
-    mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
+    raw = await asession.execute(
+        SpecificationMapper(MAP).apply(select(AlchemyBase), spec)
+    )
+    query = raw.scalars().all()
 
     # Then
     assert len(query) == 4
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_4(i_session, jane_smith):
+async def test_specification_mapper_case_4(asession, jane_smith):
     # Given
     spec = Specification(
         filter=NotContains("email", ["gmail"]) & GreaterThan("age", 20),
@@ -86,8 +94,10 @@ def test_specification_mapper_case_4(i_session, jane_smith):
     )
 
     # When
-    mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
+    raw = await asession.execute(
+        SpecificationMapper(MAP).apply(select(AlchemyBase), spec)
+    )
+    query = raw.scalars().all()
 
     # Then
     assert len(query) == 1
@@ -96,7 +106,7 @@ def test_specification_mapper_case_4(i_session, jane_smith):
 
 
 @pytest.mark.integration
-def test_specification_mapper_case_5(i_session, john_smith):
+async def test_specification_mapper_case_5(asession, john_smith):
     # Given
     spec = Specification(
         filter=NotContains("email", ["gmail"]) & GreaterThan("age", 20),
@@ -106,8 +116,10 @@ def test_specification_mapper_case_5(i_session, john_smith):
     )
 
     # When
-    mapper = SpecificationMapper(MAP)
-    query: Query = mapper.apply(i_session.query(AlchemyBase), spec).all()
+    raw = await asession.execute(
+        SpecificationMapper(MAP).apply(select(AlchemyBase), spec)
+    )
+    query = raw.scalars().all()
 
     # Then
     assert len(query) == 1
