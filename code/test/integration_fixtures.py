@@ -1,38 +1,21 @@
 import asyncio
 
-import pytest
 import pytest_asyncio
-from sqlalchemy import Column, Integer, String, event, select
+from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from plantapop import get_base
 from plantapop.shared.infrastructure.container import SessionContainer
-
-Base = get_base()
-
-
-class Test(Base):
-    __tablename__ = "test"
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-
+from plantapop.shared.infrastructure.repository.models import init_models
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
 )
 
-
-async def init_models():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
-
-
 container = SessionContainer()
 
-asyncio.run(init_models())
+asyncio.run(init_models(engine))
 
 
 @pytest_asyncio.fixture
@@ -60,18 +43,3 @@ async def connection_and_session():
 async def session(connection_and_session):
     session, conn = connection_and_session
     yield session
-
-
-@pytest.mark.asyncio
-@pytest.mark.integration
-async def test_session(session):
-    test = Test(name="test")
-    session.add(test)
-    await session.commit()
-
-
-@pytest.mark.asyncio
-@pytest.mark.integration
-async def test_session_is_empty(session):
-    objects = await session.execute(select(Test))
-    assert len(objects.scalars().all()) == 0

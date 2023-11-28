@@ -14,7 +14,6 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
 
     @inject
     def __init__(self, db_session: AsyncSession = Provide["session"]):
-        # https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html#sqlalchemy.ext.asyncio.AsyncSession.begin
         self._session = db_session
         self.repo = self.repo(self._session)
 

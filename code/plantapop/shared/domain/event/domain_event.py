@@ -29,6 +29,14 @@ class DomainEvent(ABC):
     def occurred_on(self) -> datetime:
         pass
 
+    @abstractmethod
+    def to_json(self) -> str:
+        pass
+
+    @classmethod
+    def from_json(self, json: str) -> "DomainEvent":
+        pass
+
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, DomainEvent):
             return False

@@ -1,27 +1,16 @@
 from dependency_injector import containers, providers
-from sqlalchemy import orm
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
-from plantapop.config import Config
-from plantapop.shared.infrastructure import endpoints
+from plantapop.shared.infrastructure.controller import endpoints
+from plantapop.shared.infrastructure.event import pika_event_bus
+from plantapop.shared.infrastructure.event.broker import channel_pool
 from plantapop.shared.infrastructure.repository import sqlalchemy_uow
-
-config = Config.get_instance()
-
-
-engine = create_async_engine(config.postgres.url, echo=False)
-
-SessionLocal = orm.sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
-)
-
-
-async def session() -> AsyncSession:
-    async with SessionLocal() as session:
-        yield session
+from plantapop.shared.infrastructure.repository.database import session
 
 
 class SessionContainer(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(modules=[endpoints, sqlalchemy_uow])
+    wiring_config = containers.WiringConfiguration(
+        modules=[sqlalchemy_uow, pika_event_bus, endpoints]
+    )
 
     session = providers.Resource(session)
+    channel = providers.Singleton(lambda: channel_pool)

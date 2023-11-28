@@ -1,17 +1,14 @@
-HOST: 127.0.0.1
-PORT: 8080
-RELOAD: true
-WORKERS: 1
-ENVIRONMENT: development
-LOG_LEVEL: debug
-
-postgres:
-  url: postgresql+asyncpg://postgres:postgres@localhost:5432
-  database: local_db 
-
+fastapi:
+  deploy:
+    host: 127.0.0.1
+    port: 8080
+    reload: true
+    workers: 1
+    environment: development
+    log_level: debug
 
 jwt:
-  key: super-secret-key 
+  key: super-secret-key
   algorithm: HS256
 
   access:
@@ -20,3 +17,11 @@ jwt:
   refresh:
     duration: 86400
     refresh_expiration_margin: 0
+
+postgres:
+  url: postgresql+asyncpg://postgres:postgres@localhost:5432
+
+rabbitmq:
+  url: amqp://rabbit:rabbit@localhost/
+  pool_size: 2
+  channel_pool_size: 10
