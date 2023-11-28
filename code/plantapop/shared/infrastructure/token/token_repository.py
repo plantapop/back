@@ -55,12 +55,11 @@ class RefreshJwtTokenRepository(SQLAlchemyRepository):
     model = RefreshToken
     specification_mapper = SpecificationMapper(
         {
-            "token": "token",
-            "token_type": "token_type",
-            "user_uuid": "user_uuid",
-            "device": "device",
-            "exp": "expiration_date",
-            "revoked": "revoked",
+            "token": RefreshToken.token,
+            "user_uuid": RefreshToken.user_uuid,
+            "device": RefreshToken.device,
+            "exp": RefreshToken.expiration_date,
+            "revoked": RefreshToken.revoked,
         }
     )
 

@@ -19,7 +19,6 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
         self.repo = self.repo(self._session)
 
     async def __aenter__(self) -> SQLAlchemyRepository:
-        self.transaction = self._session.begin()
         return self.repo
 
     async def __aexit__(self, exc_type, exc_value, traceback):
@@ -37,5 +36,4 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
         await self._session.rollback()
 
     async def close(self):
-        self.transaction.close()
         await self._session.close()

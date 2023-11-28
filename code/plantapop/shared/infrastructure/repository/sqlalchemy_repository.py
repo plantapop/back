@@ -62,7 +62,7 @@ class SQLAlchemyRepository(GenericRepository):
 
     async def update(self, entity: Entity) -> None:
         model = self.mapper.entity_to_model(entity)
-        self._session.merge(model)
+        await self._session.merge(model)
         self.identity_map[entity.uuid] = entity
 
     async def update_all(self, entities: List[Entity]) -> None:
@@ -71,7 +71,7 @@ class SQLAlchemyRepository(GenericRepository):
 
     async def delete(self, entity: Entity) -> None:
         model = await self._get_model(entity.uuid)
-        self._session.delete(model)
+        await self._session.delete(model)
         self._remove_from_identity_map(entity)
 
     async def delete_all(self, entities: List[Entity]) -> None:
