@@ -1,3 +1,4 @@
+import json
 from abc import ABC, abstractmethod
 from datetime import datetime
 from uuid import UUID
@@ -5,28 +6,39 @@ from uuid import UUID
 
 class DomainEvent(ABC):
     @property
-    @abstractmethod
     def event_name(self) -> str:
-        pass
+        return self._event_name
 
     @property
-    @abstractmethod
     def aggregate_uuid(self) -> UUID:
-        pass
+        return self._aggregate_uuid
 
     @property
-    @abstractmethod
     def event_body(self) -> dict:
-        pass
+        return self._event_body
 
     @property
-    @abstractmethod
     def event_uuid(self) -> UUID:
-        pass
+        return self._event_uuid
 
     @property
-    @abstractmethod
     def occurred_on(self) -> datetime:
+        return self._occurred_on
+
+    def to_json(self) -> str:
+        return json.dumps(
+            {
+                "event_name": self.event_name,
+                "aggregate_uuid": self.aggregate_uuid,
+                "event_uuid": self.event_uuid,
+                "occurred_on": self.occurred_on.isoformat(),
+                "event_body": self.event_body,
+            }
+        )
+
+    @classmethod
+    @abstractmethod
+    def from_json(cls, json: str) -> "DomainEvent":
         pass
 
     def __eq__(self, other: object) -> bool:

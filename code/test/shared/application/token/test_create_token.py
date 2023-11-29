@@ -25,10 +25,10 @@ def user():
 
 
 @pytest.mark.unit
-def test_create_token(create_token, user):
+async def test_create_token(create_token, user):
     # Given
     # When
-    tokens = create_token.execute(user["uuid"], user["device"])
+    tokens = await create_token.execute(user["uuid"], user["device"])
 
     # Then
     assert isinstance(tokens, dict)
@@ -37,9 +37,9 @@ def test_create_token(create_token, user):
 
 
 @pytest.mark.unit
-def test_create_token_valid_tokens(create_token, user):
+async def test_create_token_valid_tokens(create_token, user):
     # Given
-    tokens = create_token.execute(user["uuid"], user["device"])
+    tokens = await create_token.execute(user["uuid"], user["device"])
 
     # When
     access = jwt.decode(
@@ -66,10 +66,10 @@ def test_create_token_valid_tokens(create_token, user):
 
 @pytest.mark.unit
 @freeze_time("2021-01-01 00:00:00")
-def test_create_tokens_uses_configmap_exp_times(create_token, user):
+async def test_create_tokens_uses_configmap_exp_times(create_token, user):
     # Given
     # When
-    tokens = create_token.execute(user["uuid"], user["device"])
+    tokens = await create_token.execute(user["uuid"], user["device"])
 
     # Then
     access = jwt.decode(
@@ -96,14 +96,14 @@ def test_create_tokens_uses_configmap_exp_times(create_token, user):
 
 
 @pytest.mark.unit
-def test_create_token_invalide_old_refresh_token(create_token, user):
+async def test_create_token_invalide_old_refresh_token(create_token, user):
     # Given
-    create_token.execute(user["uuid"], user["device"])
+    await create_token.execute(user["uuid"], user["device"])
     db = create_token.uow.repo._db
     token = list(db.keys())[0]
 
     # When
-    tokens = create_token.execute(user["uuid"], user["device"])
+    tokens = await create_token.execute(user["uuid"], user["device"])
 
     # Then
     db = create_token.uow.repo._db
@@ -111,4 +111,4 @@ def test_create_token_invalide_old_refresh_token(create_token, user):
     assert isinstance(tokens["access"], str)
     assert isinstance(tokens["refresh"], str)
     assert len(db) == 2
-    assert db[token].is_revoked()
+    assert db[token].revoked

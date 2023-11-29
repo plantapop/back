@@ -10,7 +10,7 @@ CONFIGMAP = Config().get_instance()
 
 
 class ValidateToken:
-    def execute(self, token: str) -> UUID:
+    async def execute(self, token: str) -> UUID:
         validator = TokenValidationService(
             CONFIGMAP.jwt.key,
             CONFIGMAP.jwt.algorithm,

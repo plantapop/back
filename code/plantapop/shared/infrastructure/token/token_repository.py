@@ -16,7 +16,7 @@ from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
 )
 
 
-class RefreshToken(Base):
+class SQLRefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
     uuid = Column(Uuid, nullable=False)
@@ -27,8 +27,8 @@ class RefreshToken(Base):
     revoked = Column(Boolean, default=False)
 
 
-class TokenDataMapper(DataMapper[Token, RefreshToken]):
-    def model_to_entity(self, model: RefreshToken) -> Token:
+class TokenDataMapper(DataMapper[Token, SQLRefreshToken]):
+    def model_to_entity(self, model: SQLRefreshToken) -> Token:
         return Token(
             uuid=model.uuid,
             token=model.token,
@@ -39,11 +39,11 @@ class TokenDataMapper(DataMapper[Token, RefreshToken]):
             revoked=model.revoked,
         )
 
-    def entity_to_model(self, entity: Token) -> RefreshToken:
-        return RefreshToken(
-            uuid=entity.uuid.get(),
+    def entity_to_model(self, entity: Token) -> SQLRefreshToken:
+        return SQLRefreshToken(
+            uuid=entity.uuid,
             token=entity.token,
-            user_uuid=entity.user_uuid.get(),
+            user_uuid=entity.user_uuid,
             device=entity.device,
             expiration_date=entity.exp,
             revoked=entity.revoked,
@@ -52,15 +52,14 @@ class TokenDataMapper(DataMapper[Token, RefreshToken]):
 
 class RefreshJwtTokenRepository(SQLAlchemyRepository):
     mapper = TokenDataMapper()
-    model = RefreshToken
+    model = SQLRefreshToken
     specification_mapper = SpecificationMapper(
         {
-            "token": "token",
-            "token_type": "token_type",
-            "user_uuid": "user_uuid",
-            "device": "device",
-            "exp": "expiration_date",
-            "revoked": "revoked",
+            "token": SQLRefreshToken.token,
+            "user_uuid": SQLRefreshToken.user_uuid,
+            "device": SQLRefreshToken.device,
+            "exp": SQLRefreshToken.expiration_date,
+            "revoked": SQLRefreshToken.revoked,
         }
     )
 

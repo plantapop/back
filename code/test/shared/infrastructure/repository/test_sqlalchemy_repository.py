@@ -33,212 +33,212 @@ class SqlTestUoW(SQLAlchemyUnitOfWork):
 
 
 @pytest.fixture
-def repository(i_session):
-    with SqlTestUoW() as repo:
+async def repository(asession):
+    async with SqlTestUoW() as repo:
         yield repo
 
 
 @pytest.mark.integration
-def test_get_repository(repository, john_smith):
+async def test_get_repository(repository, john_smith):
     # Given
     uuid = john_smith.uuid
 
     # When
-    entity = repository.get(uuid)
+    entity = await repository.get(uuid)
 
     # Then
     assert entity.uuid == john_smith.uuid
 
 
 @pytest.mark.integration
-def test_get_random_repository(repository):
+async def test_get_random_repository(repository):
     # Given
-    uuid = GenericUUID(uuid4())
+    uuid = uuid4()
 
     # When
-    entity = repository.get(uuid)
+    entity = await repository.get(uuid)
 
     # Then
     assert entity is None
 
 
 @pytest.mark.integration
-def test_count_repository(repository, john_smith, jane_smith):
+async def test_count_repository(repository, john_smith, jane_smith):
     # Given
     spec = Specification(filter=Equals("name", "John") | Equals("name", "Jane"))
 
     # When
-    count = repository.count(spec)
+    count = await repository.count(spec)
 
     # Then
     assert count == 4
 
 
 @pytest.mark.integration
-def test_count_repository_no_spec(repository):
+async def test_count_repository_no_spec(repository):
     # Given
 
     # When
-    count = repository.count()
+    count = await repository.count()
 
     # Then
     assert count == 4
 
 
 @pytest.mark.integration
-def test_save_repository(repository, john_smith):
+async def test_save_repository(repository, john_smith):
     # Given
     new_persn = copy.deepcopy(john_smith)
-    new_persn.uuid = GenericUUID(uuid4())
+    new_persn._uuid = GenericUUID(uuid4())
     new_persn.name = "John Smith"
-    total = repository.count()
+    total = await repository.count()
 
     # When
-    repository.save(new_persn)
-    repository.commit()
+    await repository.save(new_persn)
+    await repository.commit()
 
     # Then
-    assert repository.get(new_persn.uuid).name == "John Smith"
-    assert repository.count() == total + 1
+    assert (await repository.get(new_persn.uuid)).name == "John Smith"
+    assert await repository.count() == total + 1
 
 
 @pytest.mark.integration
-def test_save_all_repository(repository, john_smith, jane_smith):
+async def test_save_all_repository(repository, john_smith, jane_smith):
     # Given
     new_john_smith = copy.deepcopy(john_smith)
-    new_john_smith.uuid = GenericUUID(uuid4())
+    new_john_smith._uuid = GenericUUID(uuid4())
     new_john_smith.name = "John Smith"
 
     new_jane_smith = copy.deepcopy(jane_smith)
-    new_jane_smith.uuid = GenericUUID(uuid4())
+    new_jane_smith._uuid = GenericUUID(uuid4())
     new_jane_smith.name = "Jane Smith"
 
-    total = repository.count()
+    total = await repository.count()
 
     # When
-    repository.save_all([new_john_smith, new_jane_smith])
-    repository.commit()
+    await repository.save_all([new_john_smith, new_jane_smith])
+    await repository.commit()
 
     # Then
-    assert repository.get(new_john_smith.uuid).name == "John Smith"
-    assert repository.get(new_jane_smith.uuid).name == "Jane Smith"
-    assert repository.count() == total + 2
+    assert (await repository.get(new_john_smith.uuid)).name == "John Smith"
+    assert (await repository.get(new_jane_smith.uuid)).name == "Jane Smith"
+    assert await repository.count() == total + 2
 
 
 @pytest.mark.integration
-def test_update_repository(repository, john_smith):
+async def test_update_repository(repository, john_smith):
     # Given
     john_smith.name = "John Smith"
-    total = repository.count()
+    total = await repository.count()
 
     # When
-    repository.update(john_smith)
-    repository.commit()
+    await repository.update(john_smith)
+    await repository.commit()
 
     # Then
-    assert repository.get(john_smith.uuid).name == "John Smith"
-    assert repository.count() == total
+    assert (await repository.get(john_smith.uuid)).name == "John Smith"
+    assert await repository.count() == total
 
 
 @pytest.mark.integration
-def test_update_all_repository(repository, john_smith, jane_smith):
+async def test_update_all_repository(repository, john_smith, jane_smith):
     # Given
     john_smith.name = "John Smith"
     jane_smith.name = "Jane Smith"
-    total = repository.count()
+    total = await repository.count()
 
     # When
-    repository.update_all([john_smith, jane_smith])
-    repository.commit()
+    await repository.update_all([john_smith, jane_smith])
+    await repository.commit()
 
     # Then
-    assert repository.get(john_smith.uuid).name == "John Smith"
-    assert repository.get(jane_smith.uuid).name == "Jane Smith"
-    assert repository.count() == total
+    assert (await repository.get(john_smith.uuid)).name == "John Smith"
+    assert (await repository.get(jane_smith.uuid)).name == "Jane Smith"
+    assert await repository.count() == total
 
 
 @pytest.mark.integration
-def test_delete_repository(repository, john_smith):
+async def test_delete_repository(repository, john_smith):
     # Given
-    total = repository.count()
+    total = await repository.count()
 
     # When
-    repository.delete(john_smith)
-    repository.commit()
+    await repository.delete(john_smith)
+    await repository.commit()
 
     # Then
-    assert repository.get(john_smith.uuid) is None
-    assert repository.count() == total - 1
+    assert await repository.get(john_smith.uuid) is None
+    assert await repository.count() == total - 1
 
 
 @pytest.mark.integration
-def test_delete_all_repository(repository, john_smith, jane_smith):
+async def test_delete_all_repository(repository, john_smith, jane_smith):
     # Given
-    total = repository.count()
+    total = await repository.count()
 
     # When
-    repository.delete_all([john_smith, jane_smith])
-    repository.commit()
+    await repository.delete_all([john_smith, jane_smith])
+    await repository.commit()
 
     # Then
-    assert repository.get(john_smith.uuid) is None
-    assert repository.get(jane_smith.uuid) is None
-    assert repository.count() == total - 2
+    assert await repository.get(john_smith.uuid) is None
+    assert await repository.get(jane_smith.uuid) is None
+    assert await repository.count() == total - 2
 
 
 @pytest.mark.integration
-def test_exists_repository(repository, john_smith):
+async def test_exists_repository(repository, john_smith):
     # Given
 
     # When
-    exists = repository.exists(john_smith.uuid)
+    exists = await repository.exists(john_smith.uuid)
 
     # Then
     assert exists is True
 
 
 @pytest.mark.integration
-def test_exists_repository_no_spec(repository):
+async def test_exists_repository_no_spec(repository):
     # Given
 
     # When
-    exists = repository.exists(GenericUUID(uuid4()))
+    exists = await repository.exists(uuid4())
 
     # Then
     assert exists is False
 
 
 @pytest.mark.integration
-def test_exists_repository_spec(repository, john_smith):
+async def test_exists_repository_spec(repository, john_smith):
     # Given
     spec = Specification(filter=Equals("name", "John"))
 
     # When
-    exists = repository.exists(spec=spec)
+    exists = await repository.exists(spec=spec)
 
     # Then
     assert exists is True
 
 
 @pytest.mark.integration
-def test_exists_repository_spec_no_match(repository, john_smith):
+async def test_exists_repository_spec_no_match(repository, john_smith):
     # Given
     spec = Specification(filter=Equals("name", "Juan"))
 
     # When
-    exists = repository.exists(spec=spec)
+    exists = await repository.exists(spec=spec)
 
     # Then
     assert exists is False
 
 
 @pytest.mark.integration
-def test_matching(repository, jane_smith):
+async def test_matching(repository, jane_smith):
     # Given
     spec = Specification(filter=Equals("name", "Jane") & Equals("age", 35))
 
     # When
-    entities = repository.matching(spec)
+    entities = await repository.matching(spec)
 
     # Then
     assert len(entities) == 1
@@ -246,35 +246,35 @@ def test_matching(repository, jane_smith):
 
 
 @pytest.mark.integration
-def test_matching_no_spec(repository):
+async def test_matching_no_spec(repository):
     # Given
 
     # When
-    entities = repository.matching(Specification())
+    entities = await repository.matching(Specification())
 
     # Then
     assert len(entities) == 4
 
 
 @pytest.mark.integration
-def test_matching_no_match(repository):
+async def test_matching_no_match(repository):
     # Given
     spec = Specification(filter=Equals("name", "Juan"))
 
     # When
-    entities = repository.matching(spec)
+    entities = await repository.matching(spec)
 
     # Then
     assert len(entities) == 0
 
 
 @pytest.mark.integration
-def test_matching_no_match_spec(repository):
+async def test_matching_no_match_spec(repository):
     # Given
     spec = Specification(filter=Equals("name", "Juan") & Equals("age", 35))
 
     # When
-    entities = repository.matching(spec)
+    entities = await repository.matching(spec)
 
     # Then
     assert len(entities) == 0

@@ -1,10 +1,7 @@
-from test.accounts.infrastructure.in_memory_event_bus import InMemoryEventBus
-from test.accounts.infrastructure.in_memory_repository import InMemoryRepository
-
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from plantapop.accounts.application.command.create_user import CreateUserCommandHandler
+from plantapop.accounts.application.command.create_user import CreateUser
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
     UserAlreadyExistsException,
@@ -14,12 +11,10 @@ from plantapop.shared.application.token.create_tokens import CreateToken
 
 router = APIRouter(prefix="/user", tags=["user"])
 
-db = InMemoryRepository()
-
 
 @router.post("/")
 def registration(body: registration.RegistrationDto):
-    command = CreateUserCommandHandler(user_repository=db, event_bus=InMemoryEventBus())
+    command = CreateUser()
     try:
         command.execute(body)
     except (EmailAlreadyExistsException, UserAlreadyExistsException) as e:

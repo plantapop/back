@@ -1,31 +1,26 @@
-from test.accounts.infrastructure.in_memory_event_bus import InMemoryEventBus
-from test.accounts.infrastructure.in_memory_repository import InMemoryRepository
 from uuid import uuid4
 
 import pytest
 
-from plantapop.accounts.application.command.create_user import CreateUserCommandHandler
+from plantapop.accounts.application.command.create_user import CreateUser
 from plantapop.accounts.domain.events.user_created import UserCreatedEvent
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
     UserAlreadyExistsException,
 )
 from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
-from plantapop.shared.domain.value_objects import GenericUUID
 
 
 @pytest.fixture
-def database():
-    return InMemoryRepository()
-
-
-@pytest.fixture
-def event_bus():
-    return InMemoryEventBus()
+def create_user_command(unit_of_work, event_bus):
+    cu = CreateUser()
+    cu.uow = unit_of_work
+    cu.event_bus = event_bus
+    return cu
 
 
 @pytest.mark.unit
-def test_create_user_saves_user(database, event_bus, app_version):
+async def test_create_user_saves_user(create_user_command, app_version):
     # Given
     user_uuid = uuid4()
     registration_dto = RegistrationDto(
@@ -41,17 +36,17 @@ def test_create_user_saves_user(database, event_bus, app_version):
     )
 
     # When
-    create_user_command = CreateUserCommandHandler(database, event_bus)
-    create_user_command.execute(registration_dto)
+    await create_user_command.execute(registration_dto)
 
     # Then
-    assert database.save_called is True
-    assert database.get(GenericUUID(user_uuid)) is not None
+    async with create_user_command.uow as repo:
+        assert await repo.get(user_uuid) is not None
 
 
 @pytest.mark.unit
-def test_create_users_sends_domain_events(database, event_bus, app_version):
+async def test_create_users_sends_domain_events(create_user_command, app_version):
     # Given
+    event_bus = create_user_command.event_bus
     user_uuid = uuid4()
     registration_dto = RegistrationDto(
         app_version=app_version,
@@ -66,8 +61,7 @@ def test_create_users_sends_domain_events(database, event_bus, app_version):
     )
 
     # When
-    create_user_command = CreateUserCommandHandler(database, event_bus)
-    create_user_command.execute(registration_dto)
+    await create_user_command.execute(registration_dto)
 
     # Then
     assert event_bus.publish_called is True
@@ -76,8 +70,8 @@ def test_create_users_sends_domain_events(database, event_bus, app_version):
 
 
 @pytest.mark.unit
-def test_create_user_raises_exception_if_user_already_exists(
-    database, event_bus, app_version
+async def test_create_user_raises_exception_if_user_already_exists(
+    create_user_command, app_version
 ):
     # Given
     user_uuid = uuid4()
@@ -105,19 +99,18 @@ def test_create_user_raises_exception_if_user_already_exists(
     )
 
     # When
-    create_user_command = CreateUserCommandHandler(database, event_bus)
-    create_user_command.execute(registration_dto)
+    await create_user_command.execute(registration_dto)
 
     # Then
     with pytest.raises(UserAlreadyExistsException):
-        create_user_command.execute(registration_dto_2)
+        await create_user_command.execute(registration_dto_2)
 
-    assert len(event_bus.events) == 1
+    assert len(create_user_command.event_bus.events) == 1
 
 
 @pytest.mark.unit
-def test_create_user_raises_exception_if_email_already_exists(
-    database, event_bus, app_version
+async def test_create_user_raises_exception_if_email_already_exists(
+    create_user_command, app_version
 ):
     # Given
     user_uuid = uuid4()
@@ -146,11 +139,10 @@ def test_create_user_raises_exception_if_email_already_exists(
     )
 
     # When
-    create_user_command = CreateUserCommandHandler(database, event_bus)
-    create_user_command.execute(registration_dto)
+    await create_user_command.execute(registration_dto)
 
     # Then
     with pytest.raises(EmailAlreadyExistsException):
-        create_user_command.execute(resgistration_dto_2)
+        await create_user_command.execute(resgistration_dto_2)
 
-    assert len(event_bus.events) == 1
+    assert len(create_user_command.event_bus.events) == 1
