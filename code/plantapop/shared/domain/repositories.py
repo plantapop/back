@@ -1,17 +1,17 @@
 from abc import ABCMeta, abstractmethod
 from typing import Generic, TypeVar
+from uuid import UUID
 
 from plantapop.shared.domain.entities import Entity as DomainEntity
 from plantapop.shared.domain.specification.specification import Specification
-from plantapop.shared.domain.value_objects import GenericUUID
 
 Entity = TypeVar("Entity", bound=DomainEntity)
-EntityUUID = TypeVar("EntityUUID", bound=GenericUUID)
+EntityUUID = TypeVar("EntityUUID", bound=UUID)
 
 
 class GenericRepository(Generic[EntityUUID, Entity], metaclass=ABCMeta):
     @abstractmethod
-    async def get(self, uuid: GenericUUID) -> Entity:
+    async def get(self, uuid: UUID) -> Entity:
         pass
 
     @abstractmethod
@@ -31,7 +31,7 @@ class GenericRepository(Generic[EntityUUID, Entity], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    async def exists(self, uuid: GenericUUID) -> bool:
+    async def exists(self, uuid: UUID) -> bool:
         pass
 
     @abstractmethod

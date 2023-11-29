@@ -3,9 +3,6 @@ from plantapop.shared.domain.value_objects import GenericUUID
 
 
 class Entity:
-    def __init__(self, uuid: GenericUUID, events: list[DomainEvent] = []):
-        self.uuid = uuid
-
     def __eq__(self, other: "Entity") -> bool:
         if hasattr(other, "uuid"):
             return self.uuid == other.uuid

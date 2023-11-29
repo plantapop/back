@@ -18,8 +18,9 @@ class UserCreatedEvent(DomainEvent):
         timezone: str,
         event_uuid: UUID | None = None,
         occurred_on: datetime | None = None,
+        event_name: str | None = None,
     ):
-        self._event_name = f"plantapop.accounts.{self.version}.event.user.created"
+        self._event_name = event_name or "plantapop.accounts.1.event.user.created"
         self._aggregate_uuid = user_uuid
         self._event_uuid = event_uuid or uuid4()
         self._occurred_on = occurred_on or datetime.utcnow()
@@ -44,4 +45,5 @@ class UserCreatedEvent(DomainEvent):
             timezone=event["event_body"]["timezone"],
             event_uuid=UUID(event["event_uuid"]),
             occurred_on=datetime.fromisoformat(event["occurred_on"]),
+            event_name=event["event_name"],
         )

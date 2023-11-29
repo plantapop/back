@@ -59,7 +59,7 @@ class FakeRepository(GenericRepository):
 
     async def count(self, specification: Specification = None) -> int:
         if specification:
-            return len(self.matching(specification))
+            return len(await self.matching(specification))
         return len(self._db)
 
     async def update(self, entity: Entity) -> None:
@@ -94,6 +94,21 @@ class FakeUnitOfWork(UnitOfWork):
         pass
 
 
+class FakeEventBus:
+    def __init__(self) -> None:
+        self.publish_called = False
+        self.events = []
+
+    async def publish(self, events: list[dict]) -> None:
+        self.publish_called = True
+        self.events.extend(events)
+
+
 @pytest.fixture
 def unit_of_work():
     return FakeUnitOfWork()
+
+
+@pytest.fixture
+def event_bus():
+    return FakeEventBus()

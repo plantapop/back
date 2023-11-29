@@ -5,8 +5,8 @@ import pytest
 from plantapop.shared.domain.specification.filter import Equals
 from plantapop.shared.domain.specification.specification import Specification
 from plantapop.shared.infrastructure.token.token_repository import (
-    RefreshToken,
     RefreshTokenUoW,
+    SQLRefreshToken,
     TokenDataMapper,
 )
 
@@ -20,7 +20,7 @@ def refresh_token(session):
 def test_refresh_token_model_to_entity(refresh_token):
     # Given
     mapper = TokenDataMapper()
-    valid_model = RefreshToken(
+    valid_model = SQLRefreshToken(
         uuid=refresh_token.uuid,
         token=refresh_token.token,
         user_uuid=refresh_token.user_uuid,
