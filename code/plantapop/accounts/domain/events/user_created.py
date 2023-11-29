@@ -25,7 +25,7 @@ class UserCreatedEvent(DomainEvent):
         self._event_uuid = event_uuid or uuid4()
         self._occurred_on = occurred_on or datetime.utcnow()
         self._event_body = {
-            "uuid": user_uuid,
+            "uuid": str(user_uuid),
             "name": user_name,
             "surnames": surnames,
             "email": email,

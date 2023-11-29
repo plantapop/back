@@ -14,10 +14,15 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
 
     @inject
     def __init__(self, db_session: AsyncSession = Provide["session"]):
-        self._session = db_session
-        self.repo = self.repo(self._session)
+        self._session = db_session  # type: _asyncio.Task
 
     async def __aenter__(self) -> SQLAlchemyRepository:
+        if not isinstance(self._session, AsyncSession):  # if multiple time enter
+            self._session = await self._session
+
+        if isinstance(self.repo, type):
+            self.repo = self.repo(self._session)
+
         return self.repo
 
     async def __aexit__(self, exc_type, exc_value, traceback):

@@ -17,7 +17,7 @@ from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
 
 
 class SQLUser(Base):
-    __tablename__ = "users"
+    __tablename__ = "account_users"
 
     uuid = Column(Uuid, primary_key=True)
     email = Column(String, nullable=False, unique=True)

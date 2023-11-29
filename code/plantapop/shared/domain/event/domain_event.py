@@ -29,8 +29,8 @@ class DomainEvent(ABC):
         return json.dumps(
             {
                 "event_name": self.event_name,
-                "aggregate_uuid": self.aggregate_uuid,
-                "event_uuid": self.event_uuid,
+                "aggregate_uuid": str(self.aggregate_uuid),
+                "event_uuid": str(self.event_uuid),
                 "occurred_on": self.occurred_on.isoformat(),
                 "event_body": self.event_body,
             }

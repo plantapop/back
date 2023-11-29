@@ -13,10 +13,10 @@ router = APIRouter(prefix="/user", tags=["user"])
 
 
 @router.post("/")
-def registration(body: registration.RegistrationDto):
+async def registration(body: registration.RegistrationDto):
     command = CreateUser()
     try:
-        command.execute(body)
+        await command.execute(body)
     except (EmailAlreadyExistsException, UserAlreadyExistsException) as e:
         if isinstance(e, EmailAlreadyExistsException):
             return JSONResponse(
@@ -28,7 +28,7 @@ def registration(body: registration.RegistrationDto):
             )
 
     token_creator = CreateToken()
-    token = token_creator.execute(body.uuid, "web")
+    token = await token_creator.execute(body.uuid, "web")
 
     return JSONResponse(
         {
