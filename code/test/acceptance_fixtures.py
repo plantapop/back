@@ -29,9 +29,7 @@ async def client(event_loop):
 
     with app.session.session.override(session):
         try:
-            yield AsyncClient(
-                app=app, base_url="http://test"
-            )  # creates new thread / loop for this client and it fails
+            yield AsyncClient(app=app, base_url="http://test")
         finally:
             await session.close()
             await trans.rollback()
