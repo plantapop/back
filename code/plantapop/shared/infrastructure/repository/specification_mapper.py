@@ -16,7 +16,6 @@ from plantapop.shared.domain.specification.specification import (
     Order,
     Specification,
 )
-from plantapop.shared.domain.value_objects import ValueObject
 
 
 class SqlAlchemyCriteriaProcessor:
@@ -52,9 +51,6 @@ class SqlAlchemyCriteriaProcessor:
     def _process_filter_criteria(self, criteria: Criteria) -> BooleanClauseList:
         field = self.map[criteria.field]
         value = criteria.value
-
-        if isinstance(criteria.value, ValueObject):
-            value = criteria.value.get()
 
         if criteria.operator == Operators.EQUALS:
             return field == value

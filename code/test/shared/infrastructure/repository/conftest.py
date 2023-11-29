@@ -18,10 +18,14 @@ class DomainBase:
     email: str
 
     def __init__(self, uuid: uuid.UUID, name: str, age: int, email: str):
-        self.uuid = GenericUUID(uuid)
+        self._uuid = GenericUUID(uuid)
         self.name = name
         self.age = age
         self.email = email
+
+    @property
+    def uuid(self) -> uuid.UUID:
+        return self._uuid.get()
 
 
 class AlchemyBase(Base):
@@ -37,7 +41,7 @@ class TestBaseDataMapper(DataMapper[DomainBase, AlchemyBase]):
     @classmethod
     def entity_to_model(cls, entity: DomainBase) -> AlchemyBase:
         return AlchemyBase(
-            uuid=entity.uuid.get(),
+            uuid=entity.uuid,
             table_name=entity.name,
             table_age=entity.age,
             table_email=entity.email,

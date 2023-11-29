@@ -42,7 +42,7 @@ async def test_revoke_all(revoke_all):
     # Then
     async with revoke_all["uow"] as repo:
         tokens = await repo.matching(Specification(filter=Equals("user_uuid", uuid)))
-        assert all([token.is_revoked() for token in tokens])
+        assert all([token.revoked for token in tokens])
 
 
 @pytest.mark.unit
@@ -61,4 +61,4 @@ async def test_revoke_all_no_tokens(revoke_all):
         tokens = await repo.matching(
             Specification(filter=Equals("user_uuid", revoke_all["uuid"]))
         )
-        assert all([not token.is_revoked() for token in tokens])
+        assert all([not token.revoked for token in tokens])

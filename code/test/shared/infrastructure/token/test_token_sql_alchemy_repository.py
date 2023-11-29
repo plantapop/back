@@ -21,9 +21,9 @@ def test_refresh_token_model_to_entity(refresh_token):
     # Given
     mapper = TokenDataMapper()
     valid_model = RefreshToken(
-        uuid=refresh_token.uuid.get(),
+        uuid=refresh_token.uuid,
         token=refresh_token.token,
-        user_uuid=refresh_token.user_uuid.get(),
+        user_uuid=refresh_token.user_uuid,
         device=refresh_token.device,
         expiration_date=refresh_token.exp,
         revoked=refresh_token.revoked,
@@ -50,9 +50,9 @@ def test_refresh_token_entity_to_model(refresh_token):
     model = mapper.entity_to_model(refresh_token)
 
     # Then
-    assert model.uuid == refresh_token.uuid.get()
+    assert model.uuid == refresh_token.uuid
     assert model.token == refresh_token.token
-    assert model.user_uuid == refresh_token.user_uuid.get()
+    assert model.user_uuid == refresh_token.user_uuid
     assert model.device == refresh_token.device
     assert model.expiration_date == refresh_token.exp
     assert model.revoked == refresh_token.revoked

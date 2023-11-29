@@ -53,7 +53,7 @@ async def test_get_repository(repository, john_smith):
 @pytest.mark.integration
 async def test_get_random_repository(repository):
     # Given
-    uuid = GenericUUID(uuid4())
+    uuid = uuid4()
 
     # When
     entity = await repository.get(uuid)
@@ -89,7 +89,7 @@ async def test_count_repository_no_spec(repository):
 async def test_save_repository(repository, john_smith):
     # Given
     new_persn = copy.deepcopy(john_smith)
-    new_persn.uuid = GenericUUID(uuid4())
+    new_persn._uuid = GenericUUID(uuid4())
     new_persn.name = "John Smith"
     total = await repository.count()
 
@@ -106,11 +106,11 @@ async def test_save_repository(repository, john_smith):
 async def test_save_all_repository(repository, john_smith, jane_smith):
     # Given
     new_john_smith = copy.deepcopy(john_smith)
-    new_john_smith.uuid = GenericUUID(uuid4())
+    new_john_smith._uuid = GenericUUID(uuid4())
     new_john_smith.name = "John Smith"
 
     new_jane_smith = copy.deepcopy(jane_smith)
-    new_jane_smith.uuid = GenericUUID(uuid4())
+    new_jane_smith._uuid = GenericUUID(uuid4())
     new_jane_smith.name = "Jane Smith"
 
     total = await repository.count()
@@ -202,7 +202,7 @@ async def test_exists_repository_no_spec(repository):
     # Given
 
     # When
-    exists = await repository.exists(GenericUUID(uuid4()))
+    exists = await repository.exists(uuid4())
 
     # Then
     assert exists is False

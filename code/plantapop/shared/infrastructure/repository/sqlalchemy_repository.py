@@ -1,4 +1,5 @@
 from typing import Dict, List, Type, TypeVar
+from uuid import UUID
 
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +8,6 @@ from sqlalchemy.future import select
 from plantapop.shared.domain.entities import Entity as DomainEntity
 from plantapop.shared.domain.repositories import GenericRepository
 from plantapop.shared.domain.specification.specification import Specification
-from plantapop.shared.domain.value_objects import GenericUUID
 from plantapop.shared.infrastructure.repository.data_mapper import DataMapper
 from plantapop.shared.infrastructure.repository.database import Base
 from plantapop.shared.infrastructure.repository.specification_mapper import (
@@ -15,7 +15,7 @@ from plantapop.shared.infrastructure.repository.specification_mapper import (
 )
 
 Entity = TypeVar("Entity", bound=DomainEntity)
-EntityUUID = TypeVar("EntityUUID", bound=GenericUUID)
+EntityUUID = TypeVar("EntityUUID", bound=UUID)
 
 
 class SQLAlchemyRepository(GenericRepository):
@@ -26,12 +26,12 @@ class SQLAlchemyRepository(GenericRepository):
     def __init__(
         self,
         db_session: AsyncSession,
-        identity_map: Dict[GenericUUID, DomainEntity] = None,
+        identity_map: Dict[UUID, DomainEntity] = None,
     ):
         self._session = db_session
         self.identity_map = identity_map or dict()
 
-    async def get(self, uuid: GenericUUID) -> Entity:
+    async def get(self, uuid: UUID) -> Entity:
         if uuid in self.identity_map:
             return self.identity_map[uuid]
         else:
@@ -41,8 +41,8 @@ class SQLAlchemyRepository(GenericRepository):
             entity = self.mapper.model_to_entity(model)
             return entity
 
-    async def _get_model(self, uuid: GenericUUID) -> Base:
-        return await self._session.get(self.model, uuid.get())
+    async def _get_model(self, uuid: UUID) -> Base:
+        return await self._session.get(self.model, uuid)
 
     async def count(self, specification: Specification = None) -> int:
         query = select(func.count()).select_from(self.model)
@@ -82,9 +82,7 @@ class SQLAlchemyRepository(GenericRepository):
         if entity.uuid in self.identity_map:
             del self.identity_map[entity.uuid]
 
-    async def exists(
-        self, uuid: GenericUUID = None, spec: Specification = None
-    ) -> bool:
+    async def exists(self, uuid: UUID = None, spec: Specification = None) -> bool:
         if uuid:
             if uuid in self.identity_map:
                 return True

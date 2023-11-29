@@ -17,13 +17,13 @@ class Token:
         exp: datetime,
         revoked: bool,
     ):
-        self.uuid = GenericUUID(uuid)
-        self.token = token
-        self.user_uuid = GenericUUID(user_uuid)
-        self.token_type = token_type
-        self.device = device
-        self.exp = exp
-        self.revoked = revoked
+        self._uuid = GenericUUID(uuid)
+        self._token = token
+        self._user_uuid = GenericUUID(user_uuid)
+        self._token_type = token_type
+        self._device = device
+        self._exp = exp
+        self._revoked = revoked
 
     @classmethod
     def create(
@@ -49,20 +49,33 @@ class Token:
 
         return cls(uuid4(), token, user_uuid, token_type, device, exp, revoked)
 
+    @property
+    def uuid(self) -> UUID:
+        return self._uuid.get()
+
+    @property
+    def token(self) -> str:
+        return self._token
+
+    @property
+    def user_uuid(self) -> UUID:
+        return self._user_uuid.get()
+
+    @property
+    def token_type(self) -> str:
+        return self._token_type
+
+    @property
+    def device(self) -> str:
+        return self._device
+
+    @property
+    def exp(self) -> datetime:
+        return self._exp
+
+    @property
+    def revoked(self) -> bool:
+        return self._revoked
+
     def revoke(self) -> None:
-        self.revoked = True
-
-    def is_revoked(self) -> bool:
-        return self.revoked
-
-    def get(self) -> str:
-        return self.token
-
-    def get_user_uuid(self) -> str:
-        return self.user_uuid
-
-    def get_device(self) -> str:
-        return self.device
-
-    def get_exp(self) -> datetime:
-        return self.exp
+        self._revoked = True

@@ -34,4 +34,4 @@ class TokenValidationService:
             await self.repository.matching(Specification(filter=Equals("token", token)))
         )[0]
 
-        return self.token.is_revoked()
+        return self.token.revoked

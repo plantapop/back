@@ -111,4 +111,4 @@ async def test_create_token_invalide_old_refresh_token(create_token, user):
     assert isinstance(tokens["access"], str)
     assert isinstance(tokens["refresh"], str)
     assert len(db) == 2
-    assert db[token].is_revoked()
+    assert db[token].revoked

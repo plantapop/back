@@ -1,7 +1,6 @@
 from uuid import UUID
 
 from plantapop.shared.domain.specification import filter, specification
-from plantapop.shared.domain.value_objects import GenericUUID
 from plantapop.shared.infrastructure.token.token_manager import TokenManager
 from plantapop.shared.infrastructure.token.token_repository import RefreshTokenUoW
 
@@ -24,7 +23,7 @@ class CreateToken:
     async def _check_token(self, repo, uuid, device):
         existing_token = await repo.matching(
             specification.Specification(
-                filter.Equals("user_uuid", GenericUUID(uuid))
+                filter.Equals("user_uuid", uuid)
                 & filter.Equals("device", device)
                 & filter.Equals("revoked", False)
             )

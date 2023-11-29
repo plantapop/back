@@ -19,14 +19,12 @@ class TokenManager:
         return access_token, refresh_token
 
     def refresh_token(self, token: Token) -> tuple[Token, Token, bool]:
-        access = self._create_token(
-            token.get_user_uuid().get(), token.get_device(), token_type="access"
-        )
+        access = self._create_token(token.user_uuid, token.device, token_type="access")
         update = False
 
         if not self._is_token_expired(token, self.exp_margin):
             token = self._create_token(
-                token.get_user_uuid().get(), token.get_device(), token_type="refresh"
+                token.user_uuid, token.device, token_type="refresh"
             )
             update = True
 
@@ -45,4 +43,4 @@ class TokenManager:
 
     @staticmethod
     def _is_token_expired(token: Token, expiration_margin: int) -> bool:
-        return token.get_exp() <= datetime.utcnow() + timedelta(days=expiration_margin)
+        return token.exp <= datetime.utcnow() + timedelta(days=expiration_margin)

@@ -31,7 +31,7 @@ async def test_specification_mapper_case_1(asession, john_smith):
 
     # Then
     assert len(query) == 1
-    assert query[0].uuid == john_smith.uuid.get()
+    assert query[0].uuid == john_smith.uuid
     assert query[0].table_name == john_smith.name
     assert query[0].table_age == john_smith.age
     assert query[0].table_email == john_smith.email
@@ -53,11 +53,11 @@ async def test_specification_mapper_case_2(asession, john_smith, jane_smith):
 
     # Then
     assert len(query) == 2
-    assert query[0].uuid == john_smith.uuid.get()
+    assert query[0].uuid == john_smith.uuid
     assert query[0].table_name == john_smith.name
     assert query[0].table_age == john_smith.age
     assert query[0].table_email == john_smith.email
-    assert query[1].uuid == jane_smith.uuid.get()
+    assert query[1].uuid == jane_smith.uuid
     assert query[1].table_name == jane_smith.name
     assert query[1].table_age == jane_smith.age
     assert query[1].table_email == jane_smith.email

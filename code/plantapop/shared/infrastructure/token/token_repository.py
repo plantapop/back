@@ -41,9 +41,9 @@ class TokenDataMapper(DataMapper[Token, RefreshToken]):
 
     def entity_to_model(self, entity: Token) -> RefreshToken:
         return RefreshToken(
-            uuid=entity.uuid.get(),
+            uuid=entity.uuid,
             token=entity.token,
-            user_uuid=entity.user_uuid.get(),
+            user_uuid=entity.user_uuid,
             device=entity.device,
             expiration_date=entity.exp,
             revoked=entity.revoked,
