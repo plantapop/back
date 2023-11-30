@@ -28,7 +28,13 @@ class PikaSubscriber(EventSubscriber):
             await self.handle(message.body)
             await message.ack()
         except Exception:
-            pass
+            await self.handle_consumption_error(message)
+
+    async def handle_consumption_error(self, message: Message) -> None:
+        if message.headers.get("x-max-retry-count") > config.rabbitmq.max_retries:
+            await self.send_to_dead_letter(message)
+        else:
+            await self.send_to_requeue(message)
 
     async def send_to_dead_letter(self, message: Message) -> None:
         async with self._chanel_pool.acquire() as channel:
@@ -39,7 +45,11 @@ class PikaSubscriber(EventSubscriber):
             await message.ack()
 
     async def send_to_requeue(self, message: Message) -> None:
-        await message.reject(requeue=True)
+        message.headers["x-max-retry-count"] += 1
+        async with self._chanel_pool.acquire() as channel:
+            exchange = await channel.declare_exchange(self.exchange_name, type="topic")
+            await exchange.publish(message, routing_key=message.routing_key)
+            await message.ack()
 
     async def handle(self, payload: bytes) -> None:
         raise NotImplementedError()

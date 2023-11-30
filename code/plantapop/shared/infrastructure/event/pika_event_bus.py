@@ -28,7 +28,8 @@ class PikaEventBus(EventBus):
             exchange = await channel.declare_exchange(self.exchange_name, type="topic")
             for event in events:
                 message = Message(
-                    event.to_json().encode("utf-8"),
+                    body=event.to_json().encode("utf-8"),
+                    headers={"x-max-retry-count": 0},
                     content_type="application/json",
                     content_encoding="utf-8",
                 )
