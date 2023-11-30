@@ -20,9 +20,8 @@ class PikaEventBus(EventBus):
     async def publish(self, events: list[DomainEvent]) -> None:
         try:
             await self._publish(events)
-        except Exception as e:
+        except Exception:
             await self.failover(events)
-            raise e
 
     async def _publish(self, events: list[DomainEvent]) -> None:
         async with self._chanel_pool.acquire() as channel:

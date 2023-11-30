@@ -1,9 +1,8 @@
 import json
 from datetime import datetime
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
-import pytest_asyncio
 
 from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.infrastructure.event.pika_event_bus import PikaEventBus
@@ -24,10 +23,10 @@ class TestDomainEvent(DomainEvent):
     def from_json(cls, payload):
         payload = json.loads(payload)
         return cls(
-            aggregate_uuid=payload["aggregate_uuid"],
+            aggregate_uuid=UUID(payload["aggregate_uuid"]),
             event_body=payload["event_body"],
-            event_uuid=payload["event_uuid"],
-            occurred_on=payload["occurred_on"],
+            event_uuid=UUID(payload["event_uuid"]),
+            occurred_on=datetime.fromisoformat(payload["occurred_on"]),
         )
 
 
@@ -35,12 +34,43 @@ class TestEventBus(PikaEventBus):
     exchange_name = "test_exchange"
 
 
+class FTestEventBus(PikaEventBus):
+    exchange_name = "test_exchange"
+
+    async def _publish(self, events: list[DomainEvent]) -> None:
+        raise Exception("Error")
+
+
 class EventBusSubscriber(PikaSubscriber):
     exchange_name = "test_exchange"
     binding_key = "#"
 
-    async def handle(self, event: DomainEvent) -> None:
-        self._cosas = 1
+    async def handle(self, payload: bytes) -> None:
+        try:
+            self._cosas = TestDomainEvent.from_json(payload)
+        except Exception:
+            self._cosas = None
+
+    async def cosas(self):
+        return self._cosas
+
+
+class FEventBusSubscriber(PikaSubscriber):
+    exchange_name = "test_exchange"
+    binding_key = "#"
+
+    def __init__(self, retries):
+        self._retries = retries
+        self.current_retries = 0
+        self._cosas = None
+        super().__init__()
+
+    async def handle(self, payload: bytes) -> None:
+        if self.current_retries < self._retries:
+            self.current_retries += 1
+            raise Exception("Error")
+        else:
+            self._cosas = TestDomainEvent.from_json(payload)
 
     async def cosas(self):
         return self._cosas
@@ -61,8 +91,18 @@ def event_bus():
     return TestEventBus()
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
+def failed_event_bus():
+    return FTestEventBus()
+
+
+@pytest.fixture
 async def subscriber(event_bus):
     subscriber = EventBusSubscriber()
     await subscriber.subscribe()
     yield subscriber
+
+
+@pytest.fixture
+async def failed_subscriber(failed_event_bus):
+    return FEventBusSubscriber

@@ -28,16 +28,7 @@ class PikaSubscriber(EventSubscriber):
             await self.handle(message.body)
             await message.ack()
         except Exception:
-            await self._consumming_error(message)
-
-    async def _consumming_error(self, message: Message) -> None:
-        if message.headers.get("x-death"):
-            if message.headers["x-death"][0]["count"] < config.rabbitmq.max_retries:
-                await self.send_to_requeue(message)
-            else:
-                await self.send_to_dead_letter(message)
-        else:
-            await self.send_to_requeue(message)
+            pass
 
     async def send_to_dead_letter(self, message: Message) -> None:
         async with self._chanel_pool.acquire() as channel:
