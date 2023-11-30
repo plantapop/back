@@ -1,28 +1,26 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar
 
+from plantapop.shared.domain.event.event_bus import EventBus
 from plantapop.shared.domain.repositories import GenericRepository
-
-U = TypeVar("U", bound="UnitOfWork")
 
 
 class UnitOfWork(ABC):
     @abstractmethod
-    def __enter__(self: U) -> GenericRepository:
+    async def __aenter__(self) -> tuple[GenericRepository, EventBus]:
         pass
 
     @abstractmethod
-    def __exit__(self, exc_type, exc_value, traceback):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         pass
 
     @abstractmethod
-    def commit(self):
+    async def commit(self):
         pass
 
     @abstractmethod
-    def rollback(self):
+    async def rollback(self):
         pass
 
     @abstractmethod
-    def close(self):
+    async def close(self):
         pass

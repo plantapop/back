@@ -1,38 +1,82 @@
+from datetime import datetime
 from uuid import UUID
 
 from plantapop.accounts.domain.events.user_created import UserCreatedEvent
-from plantapop.accounts.domain.value_objects.user_email import UserEmail
-from plantapop.accounts.domain.value_objects.user_name import UserName
-from plantapop.accounts.domain.value_objects.user_password import UserPassword
-from plantapop.accounts.domain.value_objects.user_prefered_languages import (
+from plantapop.accounts.domain.value_objects import (
+    UserEmail,
+    UserName,
+    UserPassword,
     UserPreferedLanguages,
+    UserSurnames,
+    UserTimezone,
 )
-from plantapop.accounts.domain.value_objects.user_surnames import UserSurnames
-from plantapop.accounts.domain.value_objects.user_timezone import UserTimezone
-from plantapop.shared.domain.bus.event import DomainEvent
 from plantapop.shared.domain.entities import Entity
+from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.domain.value_objects import GenericUUID
 
 
 class User(Entity):
     def __init__(
         self,
-        uuid: GenericUUID,
-        name: UserName,
-        surnames: UserSurnames,
-        email: UserEmail,
-        password: UserPassword,
-        timezone: UserTimezone,
-        language: UserPreferedLanguages,
+        uuid: UUID,
+        name: str,
+        surnames: list[str],
+        email: str,
+        password: str | bytes,
+        timezone: str,
+        language: list[str],
         events: list[DomainEvent] | None = [],
+        created_at: datetime | None = None,
+        updated_at: datetime | None = None,
+        active: bool = True,
+        verified: bool = False,
     ):
-        self.name = name
-        self.surnames = surnames
-        self.email = email
-        self.password = password
-        self.timezone = timezone
-        self.language = language
-        super().__init__(uuid, events)
+        self._uuid = GenericUUID(uuid)
+        self._name = UserName(name)
+        self._surnames = UserSurnames(surnames)
+        self._email = UserEmail(email)
+        self._timezone = UserTimezone(timezone)
+        self._language = UserPreferedLanguages(language)
+        self.events = events
+        self.created_at = created_at or datetime.utcnow()
+        self.updated_at = updated_at or datetime.utcnow()
+        self.active = active
+        self.verified = verified
+
+        if isinstance(password, str):
+            self._password = UserPassword.create(password)
+        elif isinstance(password, bytes):
+            self._password = UserPassword(password)
+        else:
+            raise ValueError("Invalid password type")
+
+    @property
+    def uuid(self) -> UUID:
+        return self._uuid.get()
+
+    @property
+    def name(self) -> str:
+        return self._name.get()
+
+    @property
+    def surnames(self) -> list[str]:
+        return self._surnames.get()
+
+    @property
+    def email(self) -> str:
+        return self._email.get()
+
+    @property
+    def password(self) -> bytes:
+        return self._password.get()
+
+    @property
+    def timezone(self) -> str:
+        return self._timezone.get()
+
+    @property
+    def language(self) -> list[str]:
+        return self._language.get()
 
     @classmethod
     def create(
@@ -46,17 +90,17 @@ class User(Entity):
         language: str,
     ):
         return User(
-            uuid=GenericUUID(uuid),
-            name=UserName.create(name),
-            surnames=UserSurnames.create(surnames),
-            email=UserEmail.create(email),
-            password=UserPassword.create(password),
-            timezone=UserTimezone.create(timezone),
-            language=UserPreferedLanguages.create(language),
+            uuid=uuid,
+            name=name,
+            surnames=surnames,
+            email=email,
+            password=password,
+            timezone=timezone,
+            language=language,
             events=[
                 UserCreatedEvent(
-                    uuid=uuid,
-                    name=name,
+                    user_uuid=uuid,
+                    user_name=name,
                     surnames=surnames,
                     email=email,
                     prefered_language=language,

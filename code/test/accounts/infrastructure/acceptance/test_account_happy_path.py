@@ -21,9 +21,9 @@ def body(app_version):
 
 
 @pytest.mark.acceptance
-def test_create_account(client, body):
+async def test_create_account(client, body):
     # When
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]
     registration = response.json()["registration"]
 
@@ -39,12 +39,12 @@ def test_create_account(client, body):
 
 
 @pytest.mark.acceptance
-def test_login(client, body):
+async def test_login(client, body):
     # Given
-    client.post("/user/", json=body)
+    await client.post("/user/", json=body)
 
     # When
-    response = client.post(
+    response = await client.post(
         "/user/login", json={"email": body["email"], "password": body["password"]}
     )
     token = response.json()["token"]
@@ -56,38 +56,40 @@ def test_login(client, body):
 
 
 @pytest.mark.acceptance
-def test_logout(client, body):
+async def test_logout(client, body):
     # Given
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
-    response = client.post("/user/logout", headers={"Authorization": f"Bearer {token}"})
+    response = await client.post(
+        "/user/logout", headers={"Authorization": f"Bearer {token}"}
+    )
 
     # Then
     assert response.status_code == 204
 
 
 @pytest.mark.acceptance
-def test_account_exists(client, body):
+async def test_account_exists(client, body):
     # Given
-    client.post("/user/", json=body)
+    await client.post("/user/", json=body)
 
     # When
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
 
     assert response.status_code == 409
-    assert response.json()["data"] == {"Error": "EMAIL_ALREADY_EXISTS"}
+    assert response.json()["data"] == {"Error": "USER_ALREADY_EXISTS"}
 
 
 @pytest.mark.acceptance
-def test_refresh_token(client, body):
+async def test_refresh_token(client, body):
     # Given
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]["refresh"]
 
     # When
-    response = client.post("/user/refresh", json={"refresh": token})
+    response = await client.post("/user/refresh", json={"refresh": token})
 
     # Then
     assert response.status_code == 200
@@ -96,25 +98,27 @@ def test_refresh_token(client, body):
 
 
 @pytest.mark.acceptance
-def test_delete_account(client, body):
+async def test_delete_account(client, body):
     # Given
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
-    response = client.delete("/user", headers={"Authorization": f"Bearer {token}"})
+    response = await client.delete(
+        "/user", headers={"Authorization": f"Bearer {token}"}
+    )
 
     # Then
     assert response.status_code == 204
 
 
 @pytest.mark.acceptance
-def test_account_not_found(client):
+async def test_account_not_found(client):
     # Given
     random_uuid = uuid4()
 
     # When
-    response = client.get(f"/user/{random_uuid}")
+    response = await client.get(f"/user/{random_uuid}")
 
     # Then
     assert response.status_code == 404
@@ -122,13 +126,13 @@ def test_account_not_found(client):
 
 
 @pytest.mark.acceptance
-def test_account_found(client, body):
+async def test_account_found(client, body):
     # Given
     user_uuid = body["uuid"]
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
 
     # When
-    response = client.get(f"/user/{user_uuid}")
+    response = await client.get(f"/user/{user_uuid}")
 
     # Then
     assert response.status_code == 200
@@ -138,13 +142,13 @@ def test_account_found(client, body):
 
 
 @pytest.mark.acceptance
-def test_change_password(client, body):
+async def test_change_password(client, body):
     # Given
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
-    response = client.put(
+    response = await client.put(
         "/user/password",
         json={"password": "new_password"},
         headers={"Authorization": f"Bearer {token}"},
@@ -155,13 +159,13 @@ def test_change_password(client, body):
 
 
 @pytest.mark.acceptance
-def test_invalid_acces_token(client, body):
+async def test_invalid_acces_token(client, body):
     # Given
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]["access"]
 
     # When
-    response = client.put(
+    response = await client.put(
         "/user/password",
         json={"password": "new_password"},
         headers={"Authorization": f"Bearer {token}123"},
@@ -173,13 +177,13 @@ def test_invalid_acces_token(client, body):
 
 
 @pytest.mark.acceptance
-def test_invalid_refresh_token(client, body):
+async def test_invalid_refresh_token(client, body):
     # Given
-    response = client.post("/user/", json=body)
+    response = await client.post("/user/", json=body)
     token = response.json()["token"]["refresh"]
 
     # When
-    response = client.post(
+    response = await client.post(
         "/user/refresh",
         json={"refresh": token + "123"},
     )

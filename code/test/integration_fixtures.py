@@ -1,43 +1,53 @@
+import asyncio
+
 import pytest
-from sqlalchemy import create_engine, event
+from sqlalchemy import event
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from plantapop import get_base
 from plantapop.shared.infrastructure.container import SessionContainer
+from plantapop.shared.infrastructure.repository.models import init_models
 
-Base = get_base()
-
-engine = create_engine("sqlite:///:memory:", echo=True)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-Base.metadata.drop_all(bind=engine)
-Base.metadata.create_all(bind=engine)
-
+engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
+TestingSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
+)
 
 container = SessionContainer()
 
+asyncio.run(init_models(engine))
+
+
+@pytest.fixture(scope="session")
+def event_loop():
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
+
 
 @pytest.fixture
-def i_session():
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
+async def connection_and_session():
+    conn = await engine.connect()
+    trans = await conn.begin()
+    session = AsyncSession(bind=conn)
 
-    nested = connection.begin_nested()
+    await conn.begin_nested()
 
-    @event.listens_for(session, "after_transaction_end")
-    def end_savepoint(sess, trans):
-        nonlocal nested
-        if not nested.is_active:
-            nested = connection.begin_nested()
+    @event.listens_for(session.sync_session, "after_transaction_end")
+    def restart_savepoint(session, transaction):
+        if transaction.nested and not transaction._parent.nested:
+            session.begin_nested()
 
-    try:
-        with container.session.override(session):
-            yield session
+    with container.session.override(session):
+        yield session, conn
 
-    finally:
-        if session.is_active:
-            session.close()
+    await session.close()
+    await trans.rollback()
+    await conn.close()
 
-        transaction.rollback()
-        connection.close()
+
+@pytest.fixture
+async def session(connection_and_session):
+    session, conn = connection_and_session
+    yield session

@@ -12,11 +12,11 @@ CONFIGMAP = Config.get_instance()
 
 
 @pytest.fixture
-def revoke_all(unit_of_work):
+async def revoke_all(unit_of_work):
     uuid = uuid4()
 
-    with unit_of_work as repo:
-        repo.save_all(
+    async with unit_of_work as repo:
+        await repo.save_all(
             [
                 TokenMother.create(user_uuid=uuid, device="a"),
                 TokenMother.create(user_uuid=uuid, device="b"),
@@ -31,34 +31,34 @@ def revoke_all(unit_of_work):
 
 
 @pytest.mark.unit
-def test_revoke_all(revoke_all):
+async def test_revoke_all(revoke_all):
     # Given
     command = revoke_all["command"]
     uuid = revoke_all["uuid"]
 
     # When
-    command.execute(uuid)
+    await command.execute(uuid)
 
     # Then
-    with revoke_all["uow"] as repo:
-        tokens = repo.matching(Specification(filter=Equals("user_uuid", uuid)))
-        assert all([token.is_revoked() for token in tokens])
+    async with revoke_all["uow"] as repo:
+        tokens = await repo.matching(Specification(filter=Equals("user_uuid", uuid)))
+        assert all([token.revoked for token in tokens])
 
 
 @pytest.mark.unit
-def test_revoke_all_no_tokens(revoke_all):
+async def test_revoke_all_no_tokens(revoke_all):
     # Given
     command = revoke_all["command"]
     uuid = uuid4()
 
     # When
-    command.execute(uuid)
+    await command.execute(uuid)
 
     # Then
-    with revoke_all["uow"] as repo:
-        tokens = repo.matching(Specification(filter=Equals("user_uuid", uuid)))
+    async with revoke_all["uow"] as repo:
+        tokens = await repo.matching(Specification(filter=Equals("user_uuid", uuid)))
         assert not tokens
-        tokens = repo.matching(
+        tokens = await repo.matching(
             Specification(filter=Equals("user_uuid", revoke_all["uuid"]))
         )
-        assert all([not token.is_revoked() for token in tokens])
+        assert all([not token.revoked for token in tokens])

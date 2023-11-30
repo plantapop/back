@@ -14,24 +14,24 @@ class RefreshToken:
         self.uow = RefreshTokenUoW()
         self.token_factory = TokenManager()
 
-    def execute(self, token: str) -> dict[str, str]:
-        with self.uow as repo:
-            validator = TokenValidationService(
+    async def execute(self, token: str) -> dict[str, str]:
+        async with self.uow as repo:
+            val = TokenValidationService(
                 key=CONFIGMAP.jwt.key,
                 algorithm=CONFIGMAP.jwt.algorithm,
                 repository=repo,
             )
 
-            if not validator.is_valid(token, "refresh") or validator.is_revoked(token):
+            if not val.is_valid(token, "refresh") or await val.is_revoked(token):
                 raise InvalidTokenException()
 
             access, refresh, refresh_updated = self.token_factory.refresh_token(
-                validator.token
+                val.token
             )
 
             if refresh_updated:
-                validator.token.revoke()
-                repo.save(validator.token)
-                repo.save(refresh)
+                val.token.revoke()
+                await repo.save(val.token)
+                await repo.save(refresh)
 
         return {"access": access.token, "refresh": refresh.token}

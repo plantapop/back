@@ -1,8 +1,8 @@
+import aio_pika
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.responses import JSONResponse
-from sqlalchemy.orm.session import Session
-from sqlalchemy.sql.expression import text
+from sqlalchemy import text
 
 from plantapop.accounts.infrastructure.controller import router as accounts_router
 
@@ -11,17 +11,20 @@ base_router = APIRouter()
 
 @base_router.get("/readiness")
 @inject
-async def readiness(session: Session = Depends(Provide["session"])) -> JSONResponse:
-    assert isinstance(session, Session)
-    try:
-        session.execute(text("SELECT 1"))
-        response_data = {"status": "OK"}
-        status_code = 200
-    except Exception as e:
-        response_data = {"status": "Error", "error": str(e)}
-        status_code = 500
+async def readiness(
+    channel_pool=Depends(Provide["channel"]),
+    session=Depends(Provide["session"]),
+) -> JSONResponse:
+    async with channel_pool.acquire() as channel:  # type: aio_pika.Channel
+        await channel.default_exchange.publish(
+            aio_pika.Message(("Channel: %r" % channel).encode()),
+            "pool_queue",
+        )
 
-    return JSONResponse(content=response_data, status_code=status_code)
+    async with session.begin():
+        await session.execute(text("SELECT 1"))
+
+    return JSONResponse(content={"status": "OK"}, status_code=200)
 
 
 ROUTES = [base_router, accounts_router]

@@ -1,9 +1,8 @@
 from plantapop.accounts.domain.exceptions import UserAlreadyExistsException
-from plantapop.accounts.domain.repository import UserRepository
-from plantapop.shared.domain.value_objects import GenericUUID
+from plantapop.accounts.domain.user import User
+from plantapop.shared.domain.repositories import GenericRepository
 
 
-def check(repository: UserRepository, uuid: GenericUUID):
-    user = repository.find_user(uuid)
-    if user:
+async def check(repository: GenericRepository, user: User):
+    if await repository.exists(user.uuid):
         raise UserAlreadyExistsException()
