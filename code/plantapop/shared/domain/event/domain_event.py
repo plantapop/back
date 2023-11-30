@@ -47,12 +47,12 @@ class DomainEvent(ABC):
 
         return (
             self.event_name == other.event_name
-            and self.aggregate_id == other.aggregate_id
+            and self.aggregate_uuid == other.aggregate_uuid
             and self.occurred_on == other.occurred_on
         )
 
     def __str__(self) -> str:
-        return f"{self.event_name} - {self.aggregate_id} - {self.occurred_on}"
+        return f"{self.event_name} - {self.aggregate_uuid} - {self.occurred_on}"
 
     def __repr__(self) -> str:
         return str(self)

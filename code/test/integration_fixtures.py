@@ -1,6 +1,6 @@
 import asyncio
 
-import pytest_asyncio
+import pytest
 from sqlalchemy import event
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -18,7 +18,15 @@ container = SessionContainer()
 asyncio.run(init_models(engine))
 
 
-@pytest_asyncio.fixture
+@pytest.fixture(scope="session")
+def event_loop():
+    policy = asyncio.get_event_loop_policy()
+    loop = policy.new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture
 async def connection_and_session():
     conn = await engine.connect()
     trans = await conn.begin()
@@ -39,7 +47,7 @@ async def connection_and_session():
     await conn.close()
 
 
-@pytest_asyncio.fixture
+@pytest.fixture
 async def session(connection_and_session):
     session, conn = connection_and_session
     yield session

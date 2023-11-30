@@ -25,6 +25,7 @@ rabbitmq:
   url: amqp://rabbit:rabbit@localhost/
   pool_size: 2
   channel_pool_size: 10
+  max_retries: 5
 
 security:
   password_rounds: 4

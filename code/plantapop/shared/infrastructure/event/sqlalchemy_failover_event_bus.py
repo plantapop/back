@@ -23,15 +23,14 @@ class SqlAlchemyFailoverEventBus(EventBus):
     exchange_name: str
 
     @inject
-    def __init__(
-        self, exchange_name: str, db_session: AsyncSession = Provide["session"]
-    ):
-        self._session = db_session
+    def __init__(self, exchange_name: str):
         self.exchange_name = exchange_name
 
-    async def publish(self, events: list[DomainEvent]) -> None:
-        async with self._session.begin():
-            self._session.add_all(
+    async def publish(
+        self, events: list[DomainEvent], db_session: AsyncSession = Provide["session"]
+    ) -> None:
+        async with db_session.begin():
+            db_session.add_all(
                 [
                     SQLDomainEvent(
                         event_uuid=event.event_uuid,
@@ -45,4 +44,4 @@ class SqlAlchemyFailoverEventBus(EventBus):
                     for event in events
                 ]
             )
-            await self._session.commit()
+            await db_session.commit()

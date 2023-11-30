@@ -15,13 +15,14 @@ class PikaEventBus(EventBus):
     @inject
     def __init__(self, chanel_pool: Pool = Provide["channel"]) -> None:
         self._chanel_pool = chanel_pool
-        self.failover = SqlAlchemyFailoverEventBus(self.exchange_name)
+        self._failover = SqlAlchemyFailoverEventBus(self.exchange_name)
 
     async def publish(self, events: list[DomainEvent]) -> None:
         try:
             await self._publish(events)
-        except Exception:
+        except Exception as e:
             await self.failover(events)
+            raise e
 
     async def _publish(self, events: list[DomainEvent]) -> None:
         async with self._chanel_pool.acquire() as channel:
@@ -35,4 +36,4 @@ class PikaEventBus(EventBus):
                 await exchange.publish(message, routing_key=event.event_name)
 
     async def failover(self, events: list[DomainEvent]) -> None:
-        await self.failover.publish(events)
+        await self._failover.publish(events)
