@@ -65,6 +65,19 @@ class SQLAlchemyRepository(GenericRepository):
         await self._session.merge(model)
         self.identity_map[entity.uuid] = entity
 
+    async def blocking_update(self, entity: Entity) -> None:
+        db_model = await self._session.get(self.model, entity.uuid).with_for_update()
+        model = self.mapper.entity_to_model(entity)
+
+        if db_model.version == model.version:
+            raise ValueError("You Should Update Aggregate version before commit")
+
+        if db_model.version != model.version - 1:
+            raise ValueError("Entity has been modified by another process")
+
+        await self._session.merge(model)
+        self.identity_map[entity.uuid] = entity
+
     async def update_all(self, entities: List[Entity]) -> None:
         for entity in entities:
             await self.update(entity)

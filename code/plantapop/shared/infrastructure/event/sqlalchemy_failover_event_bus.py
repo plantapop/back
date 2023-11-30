@@ -12,7 +12,7 @@ class SQLDomainEvent(Base):
 
     event_uuid = Column(Uuid, nullable=False, primary_key=True)
     event_name = Column(String(255), nullable=False)
-    aggregate_uuid = Column(String(36), nullable=False)
+    aggregate_uuid = Column(Uuid, nullable=False)
     event_body = Column(Text, nullable=False)
     occurred_on = Column(DateTime, nullable=False)
     exchange_name = Column(String(255), nullable=False)

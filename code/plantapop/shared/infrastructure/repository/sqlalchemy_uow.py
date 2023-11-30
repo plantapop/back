@@ -10,18 +10,15 @@ from plantapop.shared.infrastructure.repository.sqlalchemy_repository import (
 
 
 class SQLAlchemyUnitOfWork(UnitOfWork):
-    repo = Type[SQLAlchemyRepository]
+    repository: Type[SQLAlchemyRepository]
 
     @inject
-    def __init__(self, db_session: AsyncSession = Provide["session"]):
-        self._session = db_session  # type: _asyncio.Task
+    async def __aenter__(
+        self, db_session: AsyncSession = Provide["session"]
+    ) -> SQLAlchemyRepository:
+        self._session = db_session
 
-    async def __aenter__(self) -> SQLAlchemyRepository:
-        if not isinstance(self._session, AsyncSession):  # if multiple time enter
-            self._session = await self._session
-
-        if isinstance(self.repo, type):
-            self.repo = self.repo(self._session)
+        self.repo = self.repository(self._session)
 
         return self.repo
 
@@ -34,7 +31,12 @@ class SQLAlchemyUnitOfWork(UnitOfWork):
         await self.close()
 
     async def commit(self):
-        await self._session.commit()
+        try:
+            await self._session.flush()
+            await self._session.commit()
+
+        except Exception:
+            await self._session.rollback()
 
     async def rollback(self):
         await self._session.rollback()

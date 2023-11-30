@@ -19,8 +19,8 @@ from plantapop.shared.infrastructure.repository.sqlalchemy_uow import (
 class SQLRefreshToken(Base):
     __tablename__ = "refresh_tokens"
 
-    uuid = Column(Uuid, nullable=False)
-    token = Column(String, primary_key=True)
+    uuid = Column(Uuid, primary_key=True)
+    token = Column(String, nullable=False, unique=True)
     user_uuid = Column(Uuid, nullable=False)
     device = Column(String, nullable=False)
     expiration_date = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -65,4 +65,4 @@ class RefreshJwtTokenRepository(SQLAlchemyRepository):
 
 
 class RefreshTokenUoW(SQLAlchemyUnitOfWork):
-    repo = RefreshJwtTokenRepository
+    repository = RefreshJwtTokenRepository

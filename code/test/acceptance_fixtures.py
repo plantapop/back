@@ -41,7 +41,6 @@ async def client():
     with app.session.session.override(session):
         try:
             async with AsyncClient(app=app, base_url="http://test") as client:
-                print("Client is ready")
                 yield client
         finally:
             await session.close()

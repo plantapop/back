@@ -29,7 +29,7 @@ class AlchTestRep(SQLAlchemyRepository):
 
 
 class SqlTestUoW(SQLAlchemyUnitOfWork):
-    repo = AlchTestRep
+    repository = AlchTestRep
 
 
 @pytest.fixture

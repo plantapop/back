@@ -67,6 +67,8 @@ async def test_refresh_token_uow(refresh_token):
 
     # When
     async with uow as repo:
+        print(type(refresh_token.uuid))
+        print(refresh_token.uuid)
         token = await repo.get(refresh_token.uuid)
 
     # Then

@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 
 Base = declarative_base()
 
-engine = create_async_engine(
-    config.postgres.url, echo=False, poolclass=NullPool
-)
+engine = create_async_engine(config.postgres.url, echo=False, poolclass=NullPool)
 
 SessionLocal = orm.sessionmaker(
     autocommit=False, autoflush=False, bind=engine, class_=AsyncSession

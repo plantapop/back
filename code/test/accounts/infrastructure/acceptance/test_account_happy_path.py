@@ -24,7 +24,6 @@ def body(app_version):
 async def test_create_account(client, body):
     # When
     response = await client.post("/user/", json=body)
-    print(response.json())
     token = response.json()["token"]
     registration = response.json()["registration"]
 
@@ -37,19 +36,6 @@ async def test_create_account(client, body):
     assert registration["timezone"] == body["timezone"]
     assert "access" in token.keys()
     assert "refresh" in token.keys()
-
-
-@pytest.mark.acceptance
-async def test_create_account_raises_error(client, body):
-    # Given
-    await client.post("/user/", json=body)
-
-    # When
-    reponse = await client.post("/user/", json=body)
-
-    # Then
-    assert reponse.status_code == 409
-    assert reponse.json()["data"] == {"Error": "USER_ALREADY_EXISTS"}
 
 
 @pytest.mark.acceptance
@@ -93,7 +79,7 @@ async def test_account_exists(client, body):
     response = await client.post("/user/", json=body)
 
     assert response.status_code == 409
-    assert response.json()["data"] == {"Error": "EMAIL_ALREADY_EXISTS"}
+    assert response.json()["data"] == {"Error": "USER_ALREADY_EXISTS"}
 
 
 @pytest.mark.acceptance

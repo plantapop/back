@@ -85,4 +85,4 @@ class SqlUserRepository(SQLAlchemyRepository):
 
 
 class SqlUserUnitOfWork(SQLAlchemyUnitOfWork):
-    repo = SqlUserRepository
+    repository = SqlUserRepository
