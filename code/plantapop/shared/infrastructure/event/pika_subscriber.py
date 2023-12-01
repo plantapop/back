@@ -1,8 +1,12 @@
+from typing import Type
+
 from aio_pika import Message
 from aio_pika.pool import Pool
 from dependency_injector.wiring import Provide, inject
 
 from plantapop.config import Config
+from plantapop.shared.domain.event.handler import Handler
+from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.domain.event.event_subscriber import EventSubscriber
 
 config = Config.get_instance()
@@ -11,6 +15,8 @@ config = Config.get_instance()
 class PikaSubscriber(EventSubscriber):
     exchange_name: str
     binding_key: str
+    handler: Type[Handler]
+    event: Type[DomainEvent]
 
     @inject
     def __init__(self, chanel_pool: Pool = Provide["channel"]) -> None:
@@ -52,4 +58,5 @@ class PikaSubscriber(EventSubscriber):
             await message.ack()
 
     async def handle(self, payload: bytes) -> None:
-        raise NotImplementedError()
+        handler = self.handler()
+        await handler.handle(DomainEvent.from_json(payload))
