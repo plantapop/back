@@ -4,8 +4,10 @@ import subprocess
 
 def run_format():
     os.system("black .")
-    os.system("isort .")
+    os.system("isort . --overwrite-in-place")
     os.system("ruff format .")
+    # also lints
+    run_lint()
 
 
 def run_command(command):
