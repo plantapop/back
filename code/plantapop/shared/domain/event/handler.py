@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+
 from plantapop.shared.domain.event.domain_event import DomainEvent
 
 

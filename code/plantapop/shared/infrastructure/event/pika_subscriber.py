@@ -5,9 +5,9 @@ from aio_pika.pool import Pool
 from dependency_injector.wiring import Provide, inject
 
 from plantapop.config import Config
-from plantapop.shared.domain.event.handler import Handler
 from plantapop.shared.domain.event.domain_event import DomainEvent
 from plantapop.shared.domain.event.event_subscriber import EventSubscriber
+from plantapop.shared.domain.event.handler import Handler
 
 config = Config.get_instance()
 
