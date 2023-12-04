@@ -1,4 +1,5 @@
 import asyncio
+from test.conftest import init_models
 
 import pytest
 import pytest_asyncio
@@ -8,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from plantapop.shared.infrastructure.controller.app import create_app
 from plantapop.shared.infrastructure.repository.database import engine
-from plantapop.shared.infrastructure.repository.models import init_models
 
 app = create_app()
 

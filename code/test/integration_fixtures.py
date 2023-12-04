@@ -1,4 +1,5 @@
 import asyncio
+from test.conftest import init_models
 
 import pytest
 from sqlalchemy import event
@@ -6,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from plantapop.shared.infrastructure.container import SessionContainer
-from plantapop.shared.infrastructure.repository.models import init_models
 
 engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
 TestingSessionLocal = sessionmaker(
