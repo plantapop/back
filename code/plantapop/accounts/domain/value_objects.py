@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 import bcrypt
 import langcodes
 import pytz
@@ -8,6 +10,7 @@ from plantapop.shared.domain.value_objects import ValueObject
 config = Config().get_instance()
 
 
+@dataclass(frozen=True)
 class UserEmail(ValueObject[str]):
     def __post_init__(self):
         self._validate_email()
@@ -20,6 +23,7 @@ class UserEmail(ValueObject[str]):
             raise ValueError("Email must contain @")
 
 
+@dataclass(frozen=True)
 class UserName(ValueObject[str]):
     def __post_init__(self):
         self._validate_name()
@@ -29,6 +33,7 @@ class UserName(ValueObject[str]):
             raise ValueError("Name cannot be empty")
 
 
+@dataclass(frozen=True)
 class UserPreferedLanguages(ValueObject[list[str]]):
     def __post_init__(self):
         self._validate_prefered_languages()
@@ -50,9 +55,13 @@ def _crypt_password(value: str) -> tuple[bytes, bytes]:
     return bcrypt.hashpw(value.encode("utf-8"), salt)
 
 
+@dataclass(frozen=True)
 class UserPassword(ValueObject[bytes]):
     @classmethod
     def create(cls, value: str):
+        if not value:
+            raise ValueError("Password cannot be empty")
+
         hashed_password = _crypt_password(value)
         return cls(hashed_password)
 
@@ -62,6 +71,7 @@ class UserPassword(ValueObject[bytes]):
         return self.value == other.value
 
 
+@dataclass(frozen=True)
 class UserSurnames(ValueObject[list[str]]):
     def __post_init__(self):
         self._validate_surnames()
@@ -71,6 +81,7 @@ class UserSurnames(ValueObject[list[str]]):
             raise ValueError("Surnames cannot be empty")
 
 
+@dataclass(frozen=True)
 class UserTimezone(ValueObject[str]):
     def __post_init__(self):
         self._validate_timezone()

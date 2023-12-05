@@ -43,7 +43,7 @@ class User(Entity):
         self.active = active
         self.verified = verified
 
-        if isinstance(password, str):
+        if isinstance(password, str):  # TODO: Test this
             self._password = UserPassword.create(password)
         elif isinstance(password, bytes):
             self._password = UserPassword(password)
