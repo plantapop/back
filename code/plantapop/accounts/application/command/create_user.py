@@ -1,16 +1,31 @@
+from uuid import UUID
+
+from pydantic import BaseModel
+
 from plantapop.accounts.domain.services import check_email, check_uuid
 from plantapop.accounts.domain.user import User
-from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
 from plantapop.accounts.infrastructure.event_bus import AccountsEventBus
 from plantapop.accounts.infrastructure.repository import SqlUserUnitOfWork
 
 
-class CreateUser:
+class CreateUserCommand(BaseModel):
+    app_version: str
+    uuid: UUID
+    name: str
+    surnames: list[str]
+    generate_token: bool
+    password: str
+    email: str
+    prefered_language: list[str]
+    timezone: str
+
+
+class CreateUserCommandHandler:
     def __init__(self):
         self.uow = SqlUserUnitOfWork()
         self.event_bus = AccountsEventBus()
 
-    async def execute(self, user_dto: RegistrationDto):
+    async def execute(self, user_dto: CreateUserCommand):
         user = User.create(
             uuid=user_dto.uuid,
             name=user_dto.name,

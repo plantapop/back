@@ -3,18 +3,20 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from plantapop.accounts.application.command.create_user import CreateUser
+from plantapop.accounts.application.command.create_user import (
+    CreateUserCommand,
+    CreateUserCommandHandler,
+)
 from plantapop.accounts.domain.events.user_created import UserCreatedEvent
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
     UserAlreadyExistsException,
 )
-from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
 
 
 @pytest.fixture
 def create_user_command(unit_of_work, event_bus):
-    cu = CreateUser()
+    cu = CreateUserCommandHandler()
     cu.uow = unit_of_work
     cu.event_bus = event_bus
     return cu
@@ -22,7 +24,7 @@ def create_user_command(unit_of_work, event_bus):
 
 @pytest.fixture
 def registration_dto(app_version):
-    return RegistrationDto(
+    return CreateUserCommand(
         app_version=app_version,
         uuid=uuid4(),
         name="test",
@@ -222,7 +224,7 @@ async def test_create_user_invalid_uuid_raises_exception(
 ):
     # Given
     with pytest.raises(ValidationError):
-        RegistrationDto(
+        CreateUserCommand(
             app_version=app_version,
             uuid="invalid_uuid",
             name="test",

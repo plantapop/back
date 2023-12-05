@@ -1,20 +1,22 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 
-from plantapop.accounts.application.command.create_user import CreateUser
+from plantapop.accounts.application.command.create_user import (
+    CreateUserCommand,
+    CreateUserCommandHandler,
+)
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
     UserAlreadyExistsException,
 )
-from plantapop.accounts.infrastructure.dto import registration
 from plantapop.shared.application.token.create_tokens import CreateToken
 
 router = APIRouter(prefix="/user", tags=["user"])
 
 
 @router.post("/")
-async def registration(body: registration.RegistrationDto):
-    command = CreateUser()
+async def registration(body: CreateUserCommand):
+    command = CreateUserCommandHandler()
     try:
         await command.execute(body)
     except (EmailAlreadyExistsException, UserAlreadyExistsException) as e:
