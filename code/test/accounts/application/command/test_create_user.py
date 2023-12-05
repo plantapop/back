@@ -64,39 +64,17 @@ async def test_create_users_sends_domain_events(create_user_command, registratio
 
 @pytest.mark.unit
 async def test_create_user_raises_exception_if_user_already_exists(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=["test"],
-        password="test",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["es"],
-        timezone="Europe/Madrid",
-    )
-    registration_dto_2 = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test2",
-        surnames=["test2"],
-        password="test2",
-        generate_token=False,
-        email="test2@test2.com",
-        prefered_language=["en"],
-        timezone="America/New_York",
-    )
+    user_uuid = registration_dto.uuid
 
     # When
     await create_user_command.execute(registration_dto)
 
     # Then
     with pytest.raises(UserAlreadyExistsException):
-        await create_user_command.execute(registration_dto_2)
+        await create_user_command.execute(registration_dto)
 
     assert len(create_user_command.event_bus.events) == 1
     async with create_user_command.uow as repo:
@@ -107,35 +85,16 @@ async def test_create_user_raises_exception_if_user_already_exists(
 
 @pytest.mark.unit
 async def test_create_user_raises_exception_if_email_already_exists(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
     user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=["test"],
-        password="test",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["es"],
-        timezone="Europe/Madrid",
-    )
+    registration_dto.uuid = user_uuid
 
     uuid_user_2 = uuid4()
 
-    resgistration_dto_2 = RegistrationDto(
-        app_version=app_version,
-        uuid=uuid_user_2,
-        name="test2",
-        surnames=["test2"],
-        password="test2",
-        generate_token=False,
-        email="test@test.com",
-        prefered_language=["en"],
-        timezone="America/New_York",
-    )
+    resgistration_dto_2 = registration_dto.model_copy()
+    resgistration_dto_2.uuid = uuid_user_2
 
     # When
     await create_user_command.execute(registration_dto)
@@ -151,21 +110,11 @@ async def test_create_user_raises_exception_if_email_already_exists(
 
 @pytest.mark.unit
 async def test_create_user_invalid_email_raises_exception(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=["test"],
-        password="test",
-        generate_token=True,
-        email="invalid_email",
-        prefered_language=["es"],
-        timezone="Europe/Madrid",
-    )
+    user_uuid = registration_dto.uuid
+    registration_dto.email = "invalid_email"
 
     # When
     with pytest.raises(ValueError):
@@ -179,21 +128,11 @@ async def test_create_user_invalid_email_raises_exception(
 
 @pytest.mark.unit
 async def test_create_user_invalid_prefered_language_raises_exception(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=["test"],
-        password="test",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["invalid_language"],
-        timezone="Europe/Madrid",
-    )
+    user_uuid = registration_dto.uuid
+    registration_dto.prefered_language = ["invalid_languaje"]
 
     # When
     with pytest.raises(ValueError):
@@ -207,21 +146,11 @@ async def test_create_user_invalid_prefered_language_raises_exception(
 
 @pytest.mark.unit
 async def test_create_user_invalid_timezone_raises_exception(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=["test"],
-        password="test",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["es"],
-        timezone="invalid_timezone",
-    )
+    user_uuid = registration_dto.uuid
+    registration_dto.timezone = "invalid_timezone"
 
     # When
     with pytest.raises(ValueError):
@@ -235,21 +164,11 @@ async def test_create_user_invalid_timezone_raises_exception(
 
 @pytest.mark.unit
 async def test_create_user_invalid_password_raises_exception(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=["test"],
-        password="",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["es"],
-        timezone="Europe/Madrid",
-    )
+    user_uuid = registration_dto.uuid
+    registration_dto.password = ""
 
     # When
     with pytest.raises(ValueError):
@@ -263,21 +182,11 @@ async def test_create_user_invalid_password_raises_exception(
 
 @pytest.mark.unit
 async def test_create_user_invalid_name_raises_exception(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="",
-        surnames=["test"],
-        password="test",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["es"],
-        timezone="Europe/Madrid",
-    )
+    user_uuid = registration_dto.uuid
+    registration_dto.name = ""
 
     # When
     with pytest.raises(ValueError):
@@ -291,21 +200,11 @@ async def test_create_user_invalid_name_raises_exception(
 
 @pytest.mark.unit
 async def test_create_user_invalid_surnames_raises_exception(
-    create_user_command, app_version
+    create_user_command, registration_dto
 ):
     # Given
-    user_uuid = uuid4()
-    registration_dto = RegistrationDto(
-        app_version=app_version,
-        uuid=user_uuid,
-        name="test",
-        surnames=[],
-        password="test",
-        generate_token=True,
-        email="test@test.com",
-        prefered_language=["es"],
-        timezone="Europe/Madrid",
-    )
+    user_uuid = registration_dto.uuid
+    registration_dto.surnames = ""
 
     # When
     with pytest.raises(ValueError):
