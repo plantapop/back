@@ -1,18 +1,14 @@
 from plantapop.accounts.domain.services import check_email, check_uuid
 from plantapop.accounts.domain.user import User
 from plantapop.accounts.infrastructure.dto.registration import RegistrationDto
+from plantapop.accounts.infrastructure.event_bus import AccountsEventBus
 from plantapop.accounts.infrastructure.repository import SqlUserUnitOfWork
-from plantapop.shared.infrastructure.event.pika_event_bus import PikaEventBus
-
-
-class TestEB(PikaEventBus):
-    exchange_name = "test"
 
 
 class CreateUser:
     def __init__(self):
         self.uow = SqlUserUnitOfWork()
-        self.event_bus = TestEB()
+        self.event_bus = AccountsEventBus()
 
     async def execute(self, user_dto: RegistrationDto):
         user = User.create(
