@@ -14,7 +14,7 @@ class UserMother:
         email: str = "test@test.com",
         password: str | bytes = "test_password",
         timezone: str = "Europe/Madrid",
-        language: list[str] = ['en'],
+        language: list[str] = ["en"],
         events: list[DomainEvent] | None = [],
         created_at: datetime | None = None,
         updated_at: datetime | None = None,

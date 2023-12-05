@@ -3,9 +3,9 @@ from test.accounts.domain.user_mother import UserMother
 import pytest
 
 from plantapop.accounts.infrastructure.repository import (
+    SQLUser,
     SqlUserUnitOfWork,
     UserDataMapper,
-    SQLUser
 )
 
 
