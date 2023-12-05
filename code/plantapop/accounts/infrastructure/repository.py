@@ -37,7 +37,7 @@ class UserDataMapper(DataMapper[User, SQLUser]):
         return User(
             uuid=model.uuid,
             email=model.email,
-            password=bytes(model.password),
+            password=bytes(model.password, 'utf-8'),
             name=model.name,
             surnames=model.surnames.split(" "),
             timezone=model.timezone,
@@ -52,7 +52,7 @@ class UserDataMapper(DataMapper[User, SQLUser]):
         return SQLUser(
             uuid=entity.uuid,
             email=entity.email,
-            password=str(entity.password),
+            password=str(entity.password, 'utf-8'),
             name=entity.name,
             surnames=" ".join(entity.surnames),
             timezone=entity.timezone,
