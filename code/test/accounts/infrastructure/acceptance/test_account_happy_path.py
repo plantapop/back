@@ -69,7 +69,9 @@ async def test_logout(client, body):
 
     # When
     response = await client.post(
-        "/user/logout", headers={"Authorization": f"Bearer {token}"}
+        "/user/logout",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"device": body["device"]},
     )
 
     # Then

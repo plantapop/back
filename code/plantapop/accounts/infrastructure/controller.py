@@ -1,5 +1,6 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 
 from plantapop.accounts.application.command.create_user import (
     CreateUserCommand,
@@ -14,12 +15,18 @@ from plantapop.accounts.domain.exceptions import (
     UserAlreadyExistsException,
 )
 from plantapop.shared.application.token.create_tokens import CreateToken
+from plantapop.shared.application.token.revoke import Revoke
+from plantapop.shared.infrastructure.controller.security import get_user
 
 router = APIRouter(prefix="/user", tags=["user"])
 
 
+class CreateUserSchema(CreateUserCommand):
+    pass
+
+
 @router.post("/")
-async def registration(body: CreateUserCommand):
+async def registration(body: CreateUserSchema):
     command = CreateUserCommandHandler()
     try:
         await command.execute(body)
@@ -52,8 +59,12 @@ async def registration(body: CreateUserCommand):
     )
 
 
+class LogInSchema(LogInUserQuery):
+    pass
+
+
 @router.post("/login")
-async def login(body: LogInUserQuery):
+async def login(body: LogInSchema):
     query = LogInUserQueryHandler()
     response = await query.execute(body)
 
@@ -64,3 +75,15 @@ async def login(body: LogInUserQuery):
         {"token": {"access": response.access_token, "refresh": response.refresh_token}},
         status_code=200,
     )
+
+
+class LogoutSchema(BaseModel):
+    device: str
+
+
+@router.post("/logout")
+async def logout(schema: LogoutSchema, uuid: str = Depends(get_user)):
+    revoke = Revoke()
+    await revoke.execute(user_uuid=uuid, device=schema.device)
+
+    return JSONResponse(status_code=204, content="")

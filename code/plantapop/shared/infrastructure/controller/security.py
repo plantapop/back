@@ -1,17 +1,11 @@
 from uuid import UUID
 
 from fastapi import Depends
-from fastapi.security import OAuth2AuthorizationCodeBearer
-from pydantic import BaseModel
+from fastapi.security import OAuth2PasswordBearer
 
 from plantapop.shared.application.token.validate_tokens import ValidateToken
 
-oauth2_scheme = OAuth2AuthorizationCodeBearer(tokenUrl="token")
-
-
-class LogOutCommand(BaseModel):
-    uuid: UUID
-    device: str
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 async def get_user(token: str = Depends(oauth2_scheme)) -> UUID:
