@@ -9,6 +9,7 @@ import pytest
 def body(app_version):
     return {
         "app_version": app_version,
+        "device": "web",
         "uuid": str(uuid4()),
         "name": "test",
         "surnames": ["Super", "Test"],
@@ -45,7 +46,12 @@ async def test_login(client, body):
 
     # When
     response = await client.post(
-        "/user/login", json={"email": body["email"], "password": body["password"]}
+        "/user/login",
+        json={
+            "email": body["email"],
+            "password": body["password"],
+            "device": body["device"],
+        },
     )
     token = response.json()["token"]
 

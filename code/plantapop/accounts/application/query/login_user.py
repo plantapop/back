@@ -10,7 +10,7 @@ from plantapop.shared.application.token.create_tokens import CreateToken
 
 
 class LogInUserQuery(BaseModel):
-    platform: str
+    device: str
     password: str
     email: str
 
@@ -20,7 +20,7 @@ class LogInUserResponse(BaseModel):
     access_token: str
 
 
-class LoginUserQueryHandler:
+class LogInUserQueryHandler:
     def __init__(self):
         self.uow = SqlUserUnitOfWork()
         self.token_factory = CreateToken()
@@ -34,7 +34,10 @@ class LoginUserQueryHandler:
         except (UserNotFoundException, InvalidPasswordException):
             return None
 
-        tokens = await self.token_factory.execute(user.uuid, dto.platform)
+        if not user.active:
+            return None
+
+        tokens = await self.token_factory.execute(user.uuid, dto.device)
 
         return LogInUserResponse(
             refresh_token=tokens["refresh"], access_token=tokens["access"]

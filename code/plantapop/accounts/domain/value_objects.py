@@ -57,6 +57,9 @@ def _crypt_password(value: str) -> tuple[bytes, bytes]:
 
 @dataclass(frozen=True)
 class UserPassword(ValueObject[bytes]):
+    def check(self, password: str) -> bool:
+        return bcrypt.checkpw(password.encode("utf-8"), self.value)
+
     @classmethod
     def create(cls, value: str):
         if not value:

@@ -26,6 +26,7 @@ def create_user_command(unit_of_work, event_bus):
 def registration_dto(app_version):
     return CreateUserCommand(
         app_version=app_version,
+        device="web",
         uuid=uuid4(),
         name="test",
         surnames=["test"],
@@ -226,6 +227,7 @@ async def test_create_user_invalid_uuid_raises_exception(
     with pytest.raises(ValidationError):
         CreateUserCommand(
             app_version=app_version,
+            device="web",
             uuid="invalid_uuid",
             name="test",
             surnames=["test"],

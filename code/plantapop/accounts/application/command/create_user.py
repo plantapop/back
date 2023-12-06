@@ -10,6 +10,7 @@ from plantapop.accounts.infrastructure.repository import SqlUserUnitOfWork
 
 class CreateUserCommand(BaseModel):
     app_version: str
+    device: str
     uuid: UUID
     name: str
     surnames: list[str]

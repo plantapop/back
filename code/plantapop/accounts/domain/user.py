@@ -78,6 +78,12 @@ class User(Entity):
     def language(self) -> list[str]:
         return self._language.get()
 
+    def check_password(self, password: str) -> bool:
+        return self._password.check(password)
+
+    def disable(self):
+        self.active = False
+
     @classmethod
     def create(
         cls,

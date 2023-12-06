@@ -5,6 +5,10 @@ from plantapop.accounts.application.command.create_user import (
     CreateUserCommand,
     CreateUserCommandHandler,
 )
+from plantapop.accounts.application.query.login_user import (
+    LogInUserQuery,
+    LogInUserQueryHandler,
+)
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
     UserAlreadyExistsException,
@@ -30,7 +34,7 @@ async def registration(body: CreateUserCommand):
             )
 
     token_creator = CreateToken()
-    token = await token_creator.execute(body.uuid, "web")
+    token = await token_creator.execute(body.uuid, body.device)
 
     return JSONResponse(
         {
@@ -45,4 +49,18 @@ async def registration(body: CreateUserCommand):
             },
         },
         status_code=201,
+    )
+
+
+@router.post("/login")
+async def login(body: LogInUserQuery):
+    query = LogInUserQueryHandler()
+    response = await query.execute(body)
+
+    if response is None:
+        return JSONResponse({"data": {"Error": "INVALID_CREDENTIALS"}}, status_code=401)
+
+    return JSONResponse(
+        {"token": {"access": response.access_token, "refresh": response.refresh_token}},
+        status_code=200,
     )

@@ -6,6 +6,11 @@ from plantapop.shared.infrastructure.token.token_repository import RefreshTokenU
 
 
 class CreateToken:
+    """
+    Dependency of:
+    - plantapop.accounts.application.query.login_user.LogInUserQueryHandler
+    """
+
     def __init__(self):
         self.uow = RefreshTokenUoW()
         self.token_factory = TokenManager()
