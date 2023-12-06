@@ -15,6 +15,7 @@ from plantapop.accounts.domain.exceptions import (
     UserAlreadyExistsException,
 )
 from plantapop.shared.application.token.create_tokens import CreateToken
+from plantapop.shared.application.token.refresh_token import RefreshToken
 from plantapop.shared.application.token.revoke import Revoke
 from plantapop.shared.infrastructure.controller.security import get_user
 
@@ -87,3 +88,21 @@ async def logout(schema: LogoutSchema, uuid: str = Depends(get_user)):
     await revoke.execute(user_uuid=uuid, device=schema.device)
 
     return JSONResponse(status_code=204, content="")
+
+
+class RefreshSchema(BaseModel):
+    token: str
+
+
+@router.post("/refresh")
+async def refresh(schema: RefreshSchema):
+    refresh = RefreshToken()
+    response = await refresh.execute(schema.token)
+
+    return JSONResponse(
+        {
+            "access": response["access"],
+            "refresh": response["refresh"],
+        },
+        status_code=200,
+    )

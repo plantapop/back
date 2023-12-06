@@ -97,7 +97,7 @@ async def test_refresh_token(client, body):
     token = response.json()["token"]["refresh"]
 
     # When
-    response = await client.post("/user/refresh", json={"refresh": token})
+    response = await client.post("/user/refresh", json={"token": token})
 
     # Then
     assert response.status_code == 200
