@@ -24,7 +24,7 @@ def body(app_version):
 @pytest.mark.acceptance
 async def test_create_account(client, body):
     # When
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]
     registration = response.json()["registration"]
 
@@ -42,7 +42,7 @@ async def test_create_account(client, body):
 @pytest.mark.acceptance
 async def test_login(client, body):
     # Given
-    await client.post("/user/", json=body)
+    await client.post("/user/signup", json=body)
 
     # When
     response = await client.post(
@@ -64,7 +64,7 @@ async def test_login(client, body):
 @pytest.mark.acceptance
 async def test_logout(client, body):
     # Given
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]["access"]
 
     # When
@@ -81,10 +81,10 @@ async def test_logout(client, body):
 @pytest.mark.acceptance
 async def test_account_exists(client, body):
     # Given
-    await client.post("/user/", json=body)
+    await client.post("/user/signup", json=body)
 
     # When
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
 
     assert response.status_code == 409
     assert response.json()["data"] == {"Error": "USER_ALREADY_EXISTS"}
@@ -93,7 +93,7 @@ async def test_account_exists(client, body):
 @pytest.mark.acceptance
 async def test_refresh_token(client, body):
     # Given
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]["refresh"]
 
     # When
@@ -108,7 +108,7 @@ async def test_refresh_token(client, body):
 @pytest.mark.acceptance
 async def test_delete_account(client, body):
     # Given
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]["access"]
 
     # When

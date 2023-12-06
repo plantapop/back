@@ -25,7 +25,7 @@ class CreateUserSchema(CreateUserCommand):
     pass
 
 
-@router.post("/")
+@router.post("/signup")
 async def registration(body: CreateUserSchema):
     command = CreateUserCommandHandler()
     try:
