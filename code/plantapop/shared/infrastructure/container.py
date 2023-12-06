@@ -9,6 +9,7 @@ from plantapop.shared.infrastructure.event import (
 from plantapop.shared.infrastructure.event.broker import channel_pool
 from plantapop.shared.infrastructure.repository import sqlalchemy_uow
 from plantapop.shared.infrastructure.repository.database import session
+from plantapop.shared.infrastructure.repository.redis_client import get_redis_client
 
 
 class SessionContainer(containers.DeclarativeContainer):
@@ -24,3 +25,4 @@ class SessionContainer(containers.DeclarativeContainer):
 
     session = providers.Resource(session)
     channel = providers.Singleton(lambda: channel_pool)
+    redis_client = providers.Singleton(lambda: get_redis_client)

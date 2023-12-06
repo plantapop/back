@@ -101,8 +101,8 @@ async def test_refresh_token(client, body):
 
     # Then
     assert response.status_code == 200
-    assert "access" in response.json().keys()
-    assert "refresh" in response.json().keys()
+    assert "access" in response.json()["token"].keys()
+    assert "refresh" in response.json()["token"].keys()
 
 
 @pytest.mark.acceptance
@@ -112,12 +112,24 @@ async def test_delete_account(client, body):
     token = response.json()["token"]["access"]
 
     # When
-    response = await client.delete(
-        "/user", headers={"Authorization": f"Bearer {token}"}
+    response = await client.post(
+        "/user/delete",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"password": body["password"]},
+    )
+
+    error = await client.post(
+        "/user/login",
+        json={
+            "email": body["email"],
+            "password": body["password"],
+            "device": body["device"],
+        },
     )
 
     # Then
     assert response.status_code == 204
+    assert error.status_code == 401
 
 
 @pytest.mark.acceptance

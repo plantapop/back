@@ -6,6 +6,10 @@ from plantapop.accounts.application.command.create_user import (
     CreateUserCommand,
     CreateUserCommandHandler,
 )
+from plantapop.accounts.application.command.delete_user import (
+    DeleteUserCommand,
+    DeleteUserCommandHandler,
+)
 from plantapop.accounts.application.query.login_user import (
     LogInUserQuery,
     LogInUserQueryHandler,
@@ -82,7 +86,7 @@ class LogoutSchema(BaseModel):
     device: str
 
 
-@router.post("/logout")
+@router.post("/logout")  # Validate the option of a revoked access tokens redis store
 async def logout(schema: LogoutSchema, uuid: str = Depends(get_user)):
     revoke = Revoke()
     await revoke.execute(user_uuid=uuid, device=schema.device)
@@ -100,9 +104,21 @@ async def refresh(schema: RefreshSchema):
     response = await refresh.execute(schema.token)
 
     return JSONResponse(
-        {
-            "access": response["access"],
-            "refresh": response["refresh"],
-        },
+        {"token": {"access": response["access"], "refresh": response["refresh"]}},
         status_code=200,
     )
+
+
+class DeleteSchema(BaseModel):
+    password: str
+
+
+@router.post("/delete")
+async def delete(schema: DeleteSchema, uuid: str = Depends(get_user)):
+    delete = DeleteUserCommandHandler()
+    revoke = Revoke()
+
+    await revoke.execute(user_uuid=uuid, rall=True)
+    await delete.execute(DeleteUserCommand(uuid=uuid, password=schema.password))
+
+    return JSONResponse(status_code=204, content="")

@@ -1,6 +1,15 @@
 version: "3.8"
 
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    env_file:
+      redis.env
+
   postgres:
     container_name: postgres
     env_file:
@@ -45,4 +54,4 @@ networks:
 volumes:
   postgres_data:
   rabbitmq_data:
-
+  redis_data:
