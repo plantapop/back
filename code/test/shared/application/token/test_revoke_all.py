@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 
 from plantapop.config import Config
-from plantapop.shared.application.token.revoke_all import RevokeAll
+from plantapop.shared.application.token.revoke import Revoke
 from plantapop.shared.domain.specification.filter import Equals
 from plantapop.shared.domain.specification.specification import Specification
 
@@ -25,7 +25,7 @@ async def revoke_all(unit_of_work):
             ]
         )
 
-    rt = RevokeAll()
+    rt = Revoke()
     rt.uow = unit_of_work
     return {"uuid": uuid, "command": rt, "uow": unit_of_work}
 
@@ -37,7 +37,7 @@ async def test_revoke_all(revoke_all):
     uuid = revoke_all["uuid"]
 
     # When
-    await command.execute(uuid)
+    await command.execute(uuid, rall=True)
 
     # Then
     async with revoke_all["uow"] as repo:
@@ -52,7 +52,7 @@ async def test_revoke_all_no_tokens(revoke_all):
     uuid = uuid4()
 
     # When
-    await command.execute(uuid)
+    await command.execute(uuid, rall=True)
 
     # Then
     async with revoke_all["uow"] as repo:
@@ -62,3 +62,67 @@ async def test_revoke_all_no_tokens(revoke_all):
             Specification(filter=Equals("user_uuid", revoke_all["uuid"]))
         )
         assert all([not token.revoked for token in tokens])
+
+
+@pytest.mark.unit
+async def test_revoke_all_no_rall(revoke_all):
+    # Given
+    command = revoke_all["command"]
+    uuid = revoke_all["uuid"]
+
+    # When
+    with pytest.raises(Exception):
+        await command.execute(uuid, rall=False)
+
+
+@pytest.mark.unit
+async def test_revoke_device(revoke_all):
+    # Given
+    command = revoke_all["command"]
+    uuid = revoke_all["uuid"]
+
+    # When
+    await command.execute(uuid, device="a")
+
+    # Then
+    async with revoke_all["uow"] as repo:
+        tokens = await repo.matching(
+            Specification(
+                filter=Equals("user_uuid", uuid)
+                & Equals("device", "a")
+                & Equals("revoked", True)
+            )
+        )
+        assert tokens
+
+
+@pytest.mark.unit
+async def test_revoke_device_no_device(revoke_all):
+    # Given
+    command = revoke_all["command"]
+    uuid = revoke_all["uuid"]
+
+    # When
+    with pytest.raises(Exception):
+        await command.execute(uuid, device=None)
+
+
+@pytest.mark.unit
+async def test_revoke_device_and_all_wins_device(revoke_all):
+    # Given
+    command = revoke_all["command"]
+    uuid = revoke_all["uuid"]
+
+    # When
+    await command.execute(uuid, rall=True, device="a")
+
+    # Then
+    async with revoke_all["uow"] as repo:
+        tokens = await repo.matching(
+            Specification(
+                filter=Equals("user_uuid", uuid)
+                & Equals("device", "a")
+                & Equals("revoked", True)
+            )
+        )
+        assert tokens
