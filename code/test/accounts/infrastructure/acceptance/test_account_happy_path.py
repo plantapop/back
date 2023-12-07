@@ -149,7 +149,7 @@ async def test_account_not_found(client):
 async def test_account_found(client, body):
     # Given
     user_uuid = body["uuid"]
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
 
     # When
     response = await client.get(f"/user/{user_uuid}")
@@ -164,7 +164,7 @@ async def test_account_found(client, body):
 @pytest.mark.acceptance
 async def test_change_password(client, body):
     # Given
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]["access"]
 
     # When
@@ -181,14 +181,14 @@ async def test_change_password(client, body):
 @pytest.mark.acceptance
 async def test_invalid_acces_token(client, body):
     # Given
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]["access"]
 
     # When
-    response = await client.put(
-        "/user/password",
-        json={"password": "new_password"},
+    response = await client.post(
+        "/user/delete",
         headers={"Authorization": f"Bearer {token}123"},
+        json={"password": body["password"]},
     )
 
     # Then
@@ -199,13 +199,13 @@ async def test_invalid_acces_token(client, body):
 @pytest.mark.acceptance
 async def test_invalid_refresh_token(client, body):
     # Given
-    response = await client.post("/user/", json=body)
+    response = await client.post("/user/signup", json=body)
     token = response.json()["token"]["refresh"]
 
     # When
     response = await client.post(
         "/user/refresh",
-        json={"refresh": token + "123"},
+        json={"token": token + "123"},
     )
 
     # Then
