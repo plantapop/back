@@ -72,6 +72,10 @@ class User(Entity):
     def password(self) -> bytes:
         return self._password.get()
 
+    @password.setter
+    def password(self, password: str):
+        self._password = UserPassword.create(password)
+
     @property
     def timezone(self) -> str:
         return self._timezone.get()
@@ -111,7 +115,7 @@ class User(Entity):
         email: str,
         password: str,
         timezone: str,
-        language: str,
+        language: list[str],
     ):
         return User(
             uuid=uuid,
