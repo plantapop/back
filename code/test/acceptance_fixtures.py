@@ -9,18 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from plantapop.shared.infrastructure.controller.app import create_app
 from plantapop.shared.infrastructure.repository.database import engine
-from plantapop.shared.infrastructure.repository.models import get_base
 
 app = create_app()
 
 
 # Drop all tables and create all for testing
-async def init_models(engine):
-    async with engine.begin() as conn:
-        await conn.run_sync(get_base().metadata.drop_all)
-        await conn.run_sync(get_base().metadata.create_all)
-
-
 loop = asyncio.get_event_loop()
 loop.run_until_complete(init_models(engine))
 
