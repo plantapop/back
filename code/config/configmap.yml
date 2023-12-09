@@ -1,11 +1,35 @@
-HOST: 127.0.0.1
-PORT: 8080
-RELOAD: true
-WORKERS: 1
-ENVIRONMENT: development
-LOG_LEVEL: debug
+fastapi:
+  deploy:
+    host: 127.0.0.1
+    port: 8080
+    reload: true
+    workers: 1
+    environment: development
+    log_level: debug
+
+jwt:
+  key: super-secret-key
+  algorithm: HS256
+
+  access:
+    duration: 86400
+
+  refresh:
+    duration: 86400
+    refresh_expiration_margin: 0
 
 postgres:
-  url: postgresql+psycopg2://postgres:postgres@localhost:5432
-  database: local_db 
+  url: postgresql+asyncpg://postgres:postgres@localhost:5432
 
+rabbitmq:
+  url: amqp://rabbit:rabbit@localhost/
+  pool_size: 2
+  channel_pool_size: 10
+  max_retries: 5
+
+security:
+  password_rounds: 4
+
+redis:
+  max_connections: 5
+  url: redis://:redis_password@localhost:6379

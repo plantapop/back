@@ -1,18 +1,57 @@
-version: "3"
+version: "3.8"
 
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    env_file:
+      redis.env
+
   postgres:
+    container_name: postgres
     env_file:
       - postgres.env
     image: postgres:16
     ports:
       - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
   pgadmin:
     container_name: pgadmin
     image: dpage/pgadmin4
     env_file:
-      - pgpadmin.env
+      - pgadmin.env
     ports:
       - "5050:80"
     depends_on:
       - postgres
+    networks:
+      - backend
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    env_file:
+      - rabbitmq.env
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  redis_data:
