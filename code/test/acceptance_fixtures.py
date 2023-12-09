@@ -13,6 +13,11 @@ from plantapop.shared.infrastructure.repository.database import engine
 app = create_app()
 
 
+# Drop all tables and create all for testing
+loop = asyncio.get_event_loop()
+loop.run_until_complete(init_models(engine))
+
+
 @app.on_event("startup")
 async def startup_event():
     await init_models(engine)
