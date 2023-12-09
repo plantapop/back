@@ -170,7 +170,10 @@ async def test_change_password(client, body):
     # When
     response = await client.put(
         "/user/password",
-        json={"password": "new_password"},
+        json={
+            "old_password": body["password"],
+            "new_password": "new_password",
+        },
         headers={"Authorization": f"Bearer {token}"},
     )
 

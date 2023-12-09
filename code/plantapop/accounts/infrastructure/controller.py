@@ -12,6 +12,15 @@ from plantapop.accounts.application.command.delete_user import (
     DeleteUserCommand,
     DeleteUserCommandHandler,
 )
+from plantapop.accounts.application.command.update_password import (
+    UpdatePasswordCommand,
+    UpdatePasswordCommandHandler,
+)
+from plantapop.accounts.application.query.get_user import (
+    GetUserQuery,
+    GetUserQueryHandler,
+    GetUserQueryResponse,
+)
 from plantapop.accounts.application.query.login_user import (
     LogInUserQuery,
     LogInUserQueryHandler,
@@ -19,6 +28,7 @@ from plantapop.accounts.application.query.login_user import (
 from plantapop.accounts.domain.exceptions import (
     EmailAlreadyExistsException,
     UserAlreadyExistsException,
+    UserNotFoundException,
 )
 from plantapop.shared.application.token.create_tokens import CreateToken
 from plantapop.shared.application.token.refresh_token import RefreshToken
@@ -124,3 +134,41 @@ async def delete(schema: DeleteSchema, uuid: UUID = Depends(get_user)):
     await delete.execute(DeleteUserCommand(uuid=uuid, password=schema.password))
 
     return JSONResponse(status_code=204, content="")
+
+
+class UpdatePasswordSchema(BaseModel):
+    old_password: str
+    new_password: str
+
+
+@router.put("/password")
+async def update_password(schema: UpdatePasswordSchema, uuid: UUID = Depends(get_user)):
+    update = UpdatePasswordCommandHandler()
+    revoke = Revoke()
+
+    await revoke.execute(user_uuid=uuid, rall=True)
+    await update.execute(
+        UpdatePasswordCommand(
+            uuid=uuid,
+            old_password=schema.old_password,
+            new_password=schema.new_password,
+        )
+    )
+
+    return JSONResponse(status_code=204, content="")
+
+
+@router.get("/{uuid}", response_model=GetUserQueryResponse)
+async def get_user_(uuid):
+    try:
+        uuid = UUID(uuid)
+    except ValueError:
+        return JSONResponse({"data": {"Error": "INVALID_UUID"}}, status_code=400)
+
+    try:
+        query = GetUserQueryHandler()
+        response = await query.execute(GetUserQuery(uuid=uuid))
+    except UserNotFoundException:
+        return JSONResponse({"data": {"Error": "USER_NOT_FOUND"}}, status_code=404)
+
+    return JSONResponse(response.model_dump(), status_code=200)

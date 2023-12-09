@@ -41,9 +41,9 @@ async def test_get_user(query, user):
 
     # Then
     assert response == GetUserQueryResponse(
-        uuid=user.uuid,
-        username=user.name,
-        surname=user.surnames,
+        uuid=str(user.uuid),
+        name=user.name,
+        surnames=user.surnames,
         timezone=user.timezone,
     )
 

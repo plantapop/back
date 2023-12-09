@@ -7,7 +7,7 @@ from plantapop.accounts.domain.exceptions import (
     UserNotFoundException,
 )
 from plantapop.accounts.domain.user import User
-from plantapop.accounts.infrastructure.repository import SQLAlchemyUnitOfWork
+from plantapop.accounts.infrastructure.repository import SqlUserUnitOfWork
 
 
 class UpdatePasswordCommand(BaseModel):
@@ -18,7 +18,7 @@ class UpdatePasswordCommand(BaseModel):
 
 class UpdatePasswordCommandHandler:
     def __init__(self):
-        self.uow = SQLAlchemyUnitOfWork()
+        self.uow = SqlUserUnitOfWork()
 
     async def execute(self, command: UpdatePasswordCommand):
         async with self.uow as repo:

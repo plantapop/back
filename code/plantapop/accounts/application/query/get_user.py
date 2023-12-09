@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 from plantapop.accounts.domain.exceptions import UserNotFoundException
 from plantapop.accounts.domain.user import User
-from plantapop.accounts.infrastructure.repository import SQLAlchemyUnitOfWork
+from plantapop.accounts.infrastructure.repository import SqlUserUnitOfWork
 
 
 class GetUserQuery(BaseModel):
@@ -12,15 +12,15 @@ class GetUserQuery(BaseModel):
 
 
 class GetUserQueryResponse(BaseModel):
-    uuid: UUID
-    username: str
-    surname: list[str]
+    uuid: str
+    name: str
+    surnames: list[str]
     timezone: str
 
 
 class GetUserQueryHandler:
     def __init__(self):
-        self.uow = SQLAlchemyUnitOfWork()
+        self.uow = SqlUserUnitOfWork()
 
     async def execute(self, command: GetUserQuery):
         async with self.uow as repo:
@@ -30,8 +30,8 @@ class GetUserQueryHandler:
                 raise UserNotFoundException
 
             return GetUserQueryResponse(
-                uuid=user.uuid,
-                username=user.name,
-                surname=user.surnames,
+                uuid=str(user.uuid),
+                name=user.name,
+                surnames=user.surnames,
                 timezone=user.timezone,
             )
