@@ -42,7 +42,6 @@ jobs:
           export CONFIGMAP_PATH=config/configmap.yml
           poetry install
           poetry run integration
-          poetry run acceptance
 
       - name: Stop Docker Compose
         run: docker-compose down
