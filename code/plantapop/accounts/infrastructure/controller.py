@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
@@ -87,7 +89,7 @@ class LogoutSchema(BaseModel):
 
 
 @router.post("/logout")  # Validate the option of a revoked access tokens redis store
-async def logout(schema: LogoutSchema, uuid: str = Depends(get_user)):
+async def logout(schema: LogoutSchema, uuid: UUID = Depends(get_user)):
     revoke = Revoke()
     await revoke.execute(user_uuid=uuid, device=schema.device)
 
@@ -114,7 +116,7 @@ class DeleteSchema(BaseModel):
 
 
 @router.post("/delete")
-async def delete(schema: DeleteSchema, uuid: str = Depends(get_user)):
+async def delete(schema: DeleteSchema, uuid: UUID = Depends(get_user)):
     delete = DeleteUserCommandHandler()
     revoke = Revoke()
 
