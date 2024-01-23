@@ -33,19 +33,19 @@ class SQLUser(Base):
 
 
 class UserDataMapper(DataMapper[User, SQLUser]):
-    def model_to_entity(self, model: SQLUser) -> User:
+    def model_to_entity(self, instance: SQLUser) -> User:
         return User(
-            uuid=model.uuid,
-            email=model.email,
-            password=bytes(model.password, "utf-8"),
-            name=model.name,
-            surnames=model.surnames.split(" "),
-            timezone=model.timezone,
-            language=model.language.split(" "),
-            created_at=model.created_at,
-            updated_at=model.updated_at,
-            active=model.active,
-            verified=model.verified,
+            uuid=instance.uuid,  # type: ignore
+            email=str(instance.email),
+            password=bytes(instance.password, "utf-8"),  # type: ignore
+            name=str(instance.name),
+            surnames=instance.surnames.split(" "),
+            timezone=str(instance.timezone),
+            language=instance.language.split(" "),
+            created_at=instance.created_at,  # type: ignore
+            updated_at=instance.updated_at,  # type: ignore
+            active=bool(instance.active),
+            verified=bool(instance.verified),
         )
 
     def entity_to_model(self, entity: User) -> SQLUser:
@@ -64,7 +64,7 @@ class UserDataMapper(DataMapper[User, SQLUser]):
         )
 
 
-class SqlUserRepository(SQLAlchemyRepository):
+class SqlUserRepository(SQLAlchemyRepository[User]):
     mapper = UserDataMapper()
     model = SQLUser
     specification_mapper = SpecificationMapper(

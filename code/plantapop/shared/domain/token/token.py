@@ -3,10 +3,11 @@ from uuid import UUID, uuid4
 
 from jose import jwt
 
+from plantapop.shared.domain.entities import Entity
 from plantapop.shared.domain.value_objects import GenericUUID
 
 
-class Token:
+class Token(Entity):
     def __init__(
         self,
         uuid: UUID,
@@ -35,7 +36,7 @@ class Token:
         algorithm: str,
         key: str,
         revoked: bool = False,
-    ) -> str:
+    ) -> "Token":
         token = jwt.encode(
             {
                 "exp": exp,

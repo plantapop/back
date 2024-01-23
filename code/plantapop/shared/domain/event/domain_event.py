@@ -5,6 +5,20 @@ from uuid import UUID
 
 
 class DomainEvent(ABC):
+    def __init__(
+        self,
+        event_name: str,
+        aggregate_uuid: UUID,
+        event_uuid: UUID,
+        occurred_on: datetime,
+        event_body: dict,
+    ):
+        self._event_name = event_name
+        self._aggregate_uuid = aggregate_uuid
+        self._event_uuid = event_uuid
+        self._occurred_on = occurred_on
+        self._event_body = event_body
+
     @property
     def event_name(self) -> str:
         return self._event_name
@@ -38,7 +52,7 @@ class DomainEvent(ABC):
 
     @classmethod
     @abstractmethod
-    def from_json(cls, json: str) -> "DomainEvent":
+    def from_json(cls, payload: str) -> "DomainEvent":
         pass
 
     def __eq__(self, other: object) -> bool:

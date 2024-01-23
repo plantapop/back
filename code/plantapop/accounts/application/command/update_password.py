@@ -22,11 +22,11 @@ class UpdatePasswordCommandHandler:
 
     async def execute(self, command: UpdatePasswordCommand):
         async with self.uow as repo:
-            user: User = await repo.get(command.uuid)
+            user: User | None = await repo.get(command.uuid)
             if user is None:
                 raise UserNotFoundException()
             if not user.check_password(command.old_password):
                 raise InvalidPasswordException()
-            user.password = command.new_password
+            user.password = command.new_password  # type: ignore
 
             await repo.update(user)

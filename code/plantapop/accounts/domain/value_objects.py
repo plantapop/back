@@ -50,7 +50,7 @@ class UserPreferedLanguages(ValueObject[list[str]]):
                     raise ValueError("Invalid language")
 
 
-def _crypt_password(value: str) -> tuple[bytes, bytes]:
+def _crypt_password(value: str) -> bytes:
     salt = bcrypt.gensalt(rounds=config.security.password_rounds)
     return bcrypt.hashpw(value.encode("utf-8"), salt)
 

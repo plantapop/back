@@ -13,7 +13,7 @@ class ValueObject(Generic[T], metaclass=ABCMeta):
     def get(self) -> T:
         return self.value
 
-    def __eq__(self, other: "ValueObject") -> bool:
+    def __eq__(self, other) -> bool:
         if hasattr(other, "value"):
             return self.value == other.value
         return False

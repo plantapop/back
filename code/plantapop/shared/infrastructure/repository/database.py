@@ -1,4 +1,5 @@
 import logging
+from typing import AsyncGenerator
 
 from sqlalchemy import orm
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -15,10 +16,13 @@ Base = declarative_base()
 engine = create_async_engine(config.postgres.url, echo=False, poolclass=NullPool)
 
 SessionLocal = orm.sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+    class_=AsyncSession,  # type: ignore
 )
 
 
-async def session() -> AsyncSession:
-    async with SessionLocal() as session:
+async def session() -> AsyncGenerator[AsyncSession, None]:
+    async with SessionLocal() as session:  # type: ignore
         yield session

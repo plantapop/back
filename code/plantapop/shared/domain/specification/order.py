@@ -8,7 +8,7 @@ class OrderType:
 
 
 class Order:
-    order_type: OrderType
+    order_type: str
 
     def __init__(self, field: str):
         self.field = field

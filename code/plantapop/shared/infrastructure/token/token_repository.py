@@ -28,15 +28,15 @@ class SQLRefreshToken(Base):
 
 
 class TokenDataMapper(DataMapper[Token, SQLRefreshToken]):
-    def model_to_entity(self, model: SQLRefreshToken) -> Token:
+    def model_to_entity(self, instance: SQLRefreshToken) -> Token:
         return Token(
-            uuid=model.uuid,
-            token=model.token,
+            uuid=instance.uuid,  # type: ignore
+            token=str(instance.token),
             token_type="refresh",
-            user_uuid=model.user_uuid,
-            device=model.device,
-            exp=model.expiration_date,
-            revoked=model.revoked,
+            user_uuid=instance.user_uuid,  # type: ignore
+            device=str(instance.device),
+            exp=instance.expiration_date,  # type: ignore
+            revoked=bool(instance.revoked),
         )
 
     def entity_to_model(self, entity: Token) -> SQLRefreshToken:
@@ -50,7 +50,7 @@ class TokenDataMapper(DataMapper[Token, SQLRefreshToken]):
         )
 
 
-class RefreshJwtTokenRepository(SQLAlchemyRepository):
+class RefreshJwtTokenRepository(SQLAlchemyRepository[Token]):
     mapper = TokenDataMapper()
     model = SQLRefreshToken
     specification_mapper = SpecificationMapper(

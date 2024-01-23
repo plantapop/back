@@ -14,24 +14,37 @@ class TokenValidationService:
         self.repository = repository
         self.key = key
         self.algorithm = algorithm
-        self.token: Token | None = None
-        self.payload: dict | None = None
 
     def is_valid(self, token: str, token_type: str) -> bool:
         try:
-            self.payload = jwt.decode(
+            self._payload = jwt.decode(
                 token,
                 self.key,
                 algorithms=[self.algorithm],
                 options={"verify_aud": False},
             )
-            return self.payload["type"] == token_type
+            return self._payload["type"] == token_type
         except JWTError:
             return False
 
     async def is_revoked(self, token: str) -> bool:
-        self.token: Token = (
+        if not self.repository:
+            raise Exception("Repository not set")
+
+        self._token: Token = (
             await self.repository.matching(Specification(filter=Equals("token", token)))
         )[0]
 
-        return self.token.revoked
+        return self._token.revoked
+
+    @property
+    def payload(self) -> dict:
+        if not self._payload:
+            raise Exception("Payload not set")
+        return self._payload
+
+    @property
+    def token(self) -> Token:
+        if not self._token:
+            raise Exception("Token not set")
+        return self._token

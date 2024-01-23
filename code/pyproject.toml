@@ -48,6 +48,9 @@ acceptance = "ci:run_acceptancetest"
 format = "ci:run_format"
 lint = "ci:run_lint"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

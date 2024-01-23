@@ -2,32 +2,31 @@ from abc import ABCMeta, abstractmethod
 from typing import Generic, TypeVar
 from uuid import UUID
 
-from plantapop.shared.domain.entities import Entity as DomainEntity
+from plantapop.shared.domain.entities import Entity
 from plantapop.shared.domain.specification.specification import Specification
 
-Entity = TypeVar("Entity", bound=DomainEntity)
-EntityUUID = TypeVar("EntityUUID", bound=UUID)
+TEntity = TypeVar("TEntity", bound=Entity)
 
 
-class GenericRepository(Generic[EntityUUID, Entity], metaclass=ABCMeta):
+class GenericRepository(Generic[TEntity], metaclass=ABCMeta):
     @abstractmethod
-    async def get(self, uuid: UUID) -> Entity:
+    async def get(self, uuid: UUID) -> TEntity | None:
         pass
 
     @abstractmethod
-    async def save(self, entity: Entity) -> None:
+    async def save(self, entity: TEntity) -> None:
         pass
 
     @abstractmethod
-    async def save_all(self, entities: list[Entity]) -> None:
+    async def save_all(self, entities: list[TEntity]) -> None:
         pass
 
     @abstractmethod
-    async def delete(self, entity: Entity) -> None:
+    async def delete(self, entity: TEntity) -> None:
         pass
 
     @abstractmethod
-    async def delete_all(self, entities: list[Entity]) -> None:
+    async def delete_all(self, entities: list[TEntity]) -> None:
         pass
 
     @abstractmethod
@@ -35,19 +34,19 @@ class GenericRepository(Generic[EntityUUID, Entity], metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    async def matching(self, specification: Specification) -> list[Entity]:
+    async def matching(self, spec: Specification) -> list[TEntity]:
         pass
 
     @abstractmethod
-    async def count(self, specification: Specification = None) -> int:
+    async def count(self, spec: Specification | None = None) -> int:
         pass
 
     @abstractmethod
-    async def update(self, entity: Entity) -> None:
+    async def update(self, entity: TEntity) -> None:
         pass
 
     @abstractmethod
-    async def update_all(self, entities: list[Entity]) -> None:
+    async def update_all(self, entities: list[TEntity]) -> None:
         pass
 
     @abstractmethod

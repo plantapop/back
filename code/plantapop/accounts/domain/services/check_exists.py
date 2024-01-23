@@ -11,11 +11,11 @@ from plantapop.shared.domain.specification.specification import Specification
 async def check(repository: GenericRepository, email: str, password: str) -> User:
     email_filter = Specification(filter=Equals("email", email), limit=1)
 
-    user: list[User] = await repository.matching(email_filter)
-    if len(user) < 1:
+    users: list[User] = await repository.matching(email_filter)
+    if len(users) < 1:
         raise UserNotFoundException()
 
-    user = user[0]
+    user = users[0]
 
     if not user.check_password(password):
         raise InvalidPasswordException()

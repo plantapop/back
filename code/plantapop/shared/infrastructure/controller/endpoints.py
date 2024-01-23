@@ -15,7 +15,7 @@ async def readiness(
     channel_pool=Depends(Provide["channel"]),
     session=Depends(Provide["session"]),
 ) -> JSONResponse:
-    async with channel_pool.acquire() as channel:  # type: aio_pika.Channel
+    async with channel_pool.acquire() as channel:
         await channel.default_exchange.publish(
             aio_pika.Message(("Channel: %r" % channel).encode()),
             "pool_queue",

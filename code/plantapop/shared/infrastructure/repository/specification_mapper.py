@@ -1,7 +1,6 @@
 from sqlalchemy import and_, asc, desc, not_, or_
-from sqlalchemy.orm import Query
-from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.sql.expression import BinaryExpression, ColumnElement
+from sqlalchemy.schema import Column
+from sqlalchemy.sql.expression import BinaryExpression, ColumnElement, Select
 
 from plantapop.shared.domain.specification.criteria import (
     Criteria,
@@ -15,7 +14,7 @@ from plantapop.shared.domain.specification.specification import Order, Specifica
 
 
 class SqlAlchemyCriteriaProcessor:
-    def __init__(self, map: dict[str, InstrumentedAttribute]):
+    def __init__(self, map: dict[str, Column]):
         self.map = map
 
     def to_sqlalchemy_criteria(
@@ -67,11 +66,11 @@ class SqlAlchemyCriteriaProcessor:
 
 
 class SpecificationMapper:
-    def __init__(self, map: dict[str, InstrumentedAttribute]):
+    def __init__(self, map: dict[str, Column]):
         self.map = map
         self.criteria_processor = SqlAlchemyCriteriaProcessor(self.map)
 
-    def apply(self, query: Query, specification: Specification) -> Query:
+    def apply(self, query: Select, specification: Specification) -> Select:
         if specification.filter:
             query = query.filter(
                 self.criteria_processor.to_sqlalchemy_criteria(specification.filter)

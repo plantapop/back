@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 
-from plantapop.shared.domain.event.event_bus import EventBus
 from plantapop.shared.domain.repositories import GenericRepository
 
 
 class UnitOfWork(ABC):
     @abstractmethod
-    async def __aenter__(self) -> tuple[GenericRepository, EventBus]:
+    async def __aenter__(self) -> GenericRepository:
         pass
 
     @abstractmethod

@@ -34,8 +34,8 @@ class UserDeletedEvent(DomainEvent):
         }
 
     @classmethod
-    def from_json(cls, json: json) -> "UserDeletedEvent":
-        event = json.loads(json)
+    def from_json(cls, payload: str) -> "UserDeletedEvent":
+        event = json.loads(payload)
         return cls(
             user_uuid=UUID(event["aggregate_uuid"]),
             user_name=event["event_body"]["name"],

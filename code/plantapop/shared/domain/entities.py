@@ -5,7 +5,7 @@ from plantapop.shared.domain.event.domain_event import DomainEvent
 
 
 class Entity(metaclass=ABCMeta):
-    def __eq__(self, other: "Entity") -> bool:
+    def __eq__(self, other) -> bool:
         if hasattr(other, "uuid"):
             return self.uuid == other.uuid
         return False
@@ -16,8 +16,8 @@ class Entity(metaclass=ABCMeta):
         pass
 
     def pull_domain_events(self) -> list[DomainEvent]:
-        events = self.events or []
-        self.events = []
+        events: list[DomainEvent] = self.events or []
+        self.events: list[DomainEvent] = []
         return events
 
 
@@ -28,4 +28,5 @@ class AggregateRoot(Entity, metaclass=ABCMeta):
     @property
     @abstractmethod
     def version(self) -> int:
-        return self._version
+        # return self._version
+        pass

@@ -1,6 +1,6 @@
 from typing import Type
 
-from aio_pika import Message
+from aio_pika import IncomingMessage as Message
 from aio_pika.pool import Pool
 from dependency_injector.wiring import Provide, inject
 
@@ -51,7 +51,7 @@ class PikaSubscriber(EventSubscriber):
             await message.ack()
 
     async def send_to_requeue(self, message: Message) -> None:
-        message.headers["x-max-retry-count"] += 1
+        message.headers["x-max-retry-count"] += 1  # type: ignore
         async with self._chanel_pool.acquire() as channel:
             exchange = await channel.declare_exchange(self.exchange_name, type="topic")
             await exchange.publish(message, routing_key=message.routing_key)
@@ -59,4 +59,5 @@ class PikaSubscriber(EventSubscriber):
 
     async def handle(self, payload: bytes) -> None:
         handler = self.handler()
-        await handler.handle(DomainEvent.from_json(payload))
+        string_payload = payload.decode("utf-8")
+        await handler.handle(DomainEvent.from_json(string_payload))

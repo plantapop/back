@@ -12,10 +12,11 @@ configmap = Config.get_instance()
 
 def create_app():
     app = FastAPI()
+
     app.add_middleware(InvalidTokenMiddleware)
     session_container = SessionContainer()
 
-    app.config = configmap
-    app.session = session_container
+    app.config = configmap  # type: ignore
+    app.session = session_container  # type: ignore
     app = FastApiEndpoints(app).register()
     return app
