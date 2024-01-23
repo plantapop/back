@@ -15,6 +15,7 @@ class Operators:
 
 
 class Filter(Criteria):
+    operator: str
     field: Any
     value: Any
 

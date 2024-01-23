@@ -1,7 +1,7 @@
 from sqlalchemy import and_, asc, desc, not_, or_
 from sqlalchemy.orm import Query
 from sqlalchemy.orm.attributes import InstrumentedAttribute
-from sqlalchemy.sql.elements import BooleanClauseList
+from sqlalchemy.sql.expression import BinaryExpression, ColumnElement
 
 from plantapop.shared.domain.specification.criteria import (
     Criteria,
@@ -9,20 +9,18 @@ from plantapop.shared.domain.specification.criteria import (
     _AndOrCriteria,
     _NotCriteria,
 )
-from plantapop.shared.domain.specification.filter import Operators
+from plantapop.shared.domain.specification.filter import Filter, Operators
 from plantapop.shared.domain.specification.order import OrderType
-from plantapop.shared.domain.specification.specification import (
-    Filter,
-    Order,
-    Specification,
-)
+from plantapop.shared.domain.specification.specification import Order, Specification
 
 
 class SqlAlchemyCriteriaProcessor:
     def __init__(self, map: dict[str, InstrumentedAttribute]):
         self.map = map
 
-    def to_sqlalchemy_criteria(self, criteria: Criteria) -> BooleanClauseList:
+    def to_sqlalchemy_criteria(
+        self, criteria: Criteria
+    ) -> BinaryExpression | ColumnElement:
         if isinstance(criteria, _AndOrCriteria):
             return self._process_and_or_criteria(criteria)
 
@@ -35,7 +33,7 @@ class SqlAlchemyCriteriaProcessor:
         else:
             raise ValueError("Unsupported criteria type")
 
-    def _process_and_or_criteria(self, criteria: Criteria) -> BooleanClauseList:
+    def _process_and_or_criteria(self, criteria: _AndOrCriteria) -> ColumnElement:
         crit_a, crit_b = criteria._crits
         operator = and_ if isinstance(criteria, _AndCriteria) else or_
 
@@ -44,11 +42,11 @@ class SqlAlchemyCriteriaProcessor:
             self.to_sqlalchemy_criteria(crit_b),
         )
 
-    def _process_not_criteria(self, criteria: Criteria) -> BooleanClauseList:
+    def _process_not_criteria(self, criteria: _NotCriteria) -> ColumnElement:
         inner_crit = criteria._crit
         return not_(self.to_sqlalchemy_criteria(inner_crit))
 
-    def _process_filter_criteria(self, criteria: Criteria) -> BooleanClauseList:
+    def _process_filter_criteria(self, criteria: Filter) -> BinaryExpression:
         field = self.map[criteria.field]
         value = criteria.value
 
@@ -69,7 +67,7 @@ class SqlAlchemyCriteriaProcessor:
 
 
 class SpecificationMapper:
-    def __init__(self, map: dict[str, str]):
+    def __init__(self, map: dict[str, InstrumentedAttribute]):
         self.map = map
         self.criteria_processor = SqlAlchemyCriteriaProcessor(self.map)
 
@@ -90,7 +88,7 @@ class SpecificationMapper:
 
         return query
 
-    def map_order(self, order: Order | None):
+    def map_order(self, order: Order):
         if order.order_type == OrderType.ASC:
             return asc(self.map[order.field])
         elif order.order_type == OrderType.DESC:
