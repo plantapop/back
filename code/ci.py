@@ -32,3 +32,11 @@ def run_integrationtest():
 
 def run_acceptancetest():
     run_command("pytest -m acceptance")
+
+
+def run_mutmut():
+    run_command("mutmut run")
+
+
+def run_mutmut_report():
+    run_command("mutmut junitxml --suspicious-policy=ignore --untested-policy=ignore")

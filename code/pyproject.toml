@@ -28,6 +28,7 @@ aio-pika = "^9.3.1"
 aiosqlite = "^0.19.0"
 asyncpg = "^0.29.0"
 redis = "^5.0.1"
+mutmut = "^2.4.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.0"
@@ -47,6 +48,8 @@ integration = "ci:run_integrationtest"
 acceptance = "ci:run_acceptancetest"
 format = "ci:run_format"
 lint = "ci:run_lint"
+mutate = "ci:run_mutmut"
+mutate_report = "ci:run_mutmut_report"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
@@ -63,3 +66,8 @@ ignore = ["W292", "W503", "E203"]
 profile = "black"
 filter_files = true
 skip_glob = ["**/migrations/**"]
+
+[tool.mutmut]
+paths_to_mutate = "plantapop/"
+runner = "pytest -m unit"
+
