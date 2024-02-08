@@ -12,6 +12,9 @@ from plantapop.shared.application.token.create_tokens import CreateToken
 CONFIGMAP = Config.get_instance()
 
 
+pytestmark = pytest.mark.shared
+
+
 @pytest.fixture
 def create_token(unit_of_work):
     ct = CreateToken()

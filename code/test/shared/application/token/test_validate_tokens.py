@@ -8,6 +8,8 @@ from plantapop.shared.application.token.validate_tokens import ValidateToken
 
 CONFIGMAP = Config.get_instance()
 
+pytestmark = pytest.mark.shared
+
 
 @pytest.fixture
 def validator():

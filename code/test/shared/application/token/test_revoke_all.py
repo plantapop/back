@@ -10,6 +10,8 @@ from plantapop.shared.domain.specification.specification import Specification
 
 CONFIGMAP = Config.get_instance()
 
+pytestmark = pytest.mark.shared
+
 
 @pytest.fixture
 async def revoke_all(unit_of_work):

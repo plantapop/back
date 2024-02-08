@@ -70,4 +70,4 @@ skip_glob = ["**/migrations/**"]
 [tool.mutmut]
 paths_to_mutate = "plantapop/"
 runner = "pytest -m unit"
-
+disable_mutation_types = "decorator"

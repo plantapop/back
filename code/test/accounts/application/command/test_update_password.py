@@ -16,6 +16,9 @@ uuid = uuid4()
 password = "test"
 
 
+pytestmark = pytest.mark.accounts
+
+
 @pytest.fixture
 def user():
     user = UserMother.create(

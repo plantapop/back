@@ -10,6 +10,8 @@ from plantapop.shared.domain.token.exceptions import InvalidTokenException
 
 CONFIGMAP = Config.get_instance()
 
+pytestmark = pytest.mark.shared
+
 
 @pytest.fixture
 async def refresh_token(unit_of_work):

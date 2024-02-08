@@ -13,6 +13,8 @@ from plantapop.accounts.domain.exceptions import UserNotFoundException
 uuid = uuid4()
 password = "test"
 
+pytestmark = pytest.mark.accounts
+
 
 @pytest.fixture
 def user():

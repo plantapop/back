@@ -13,6 +13,8 @@ from plantapop.accounts.domain.exceptions import (
     UserAlreadyExistsException,
 )
 
+pytestmark = pytest.mark.accounts
+
 
 @pytest.fixture
 def create_user_command(unit_of_work, event_bus):

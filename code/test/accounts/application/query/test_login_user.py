@@ -9,6 +9,8 @@ from plantapop.accounts.application.query.login_user import (
     LogInUserResponse,
 )
 
+pytestmark = pytest.mark.accounts
+
 
 @pytest.fixture
 def user():
